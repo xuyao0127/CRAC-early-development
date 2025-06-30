@@ -1,51 +1,30 @@
-# This is the version of latex2man of 2017/10/03, with bug fixes from the author
-# Since this will be invoked only by developers, delete local latex2man
-#   when the author's version makes its way into our current distro.
-LATEX2MAN=./latex2man
-hdr=header.tex
-ftr=footer.tex
-macros=macros.trans
-tmp=tmp.tex
-vtmp=vtmp.tex
+mandir=${prefix}/share/man
+PANDOC=no
+INSTALL_DATA = ${INSTALL} -m 644
 
-targets = dmtcp_command dmtcp_coordinator dmtcp_launch dmtcp_restart dmtcp_srun_helper
+MANPAGES = mana.1.gz
 
-default:
-	echo "\setVersion{`cat ../VERSION`}" > $(vtmp)
-	echo "\setDate{`date +"%B, %Y"`}" >> $(vtmp)
-	for i in $(targets); do \
-	  (cat $(hdr) $(vtmp) $$i.latex2man $(ftr) > $(tmp) && \
-	   ${LATEX2MAN} -t $(macros) $(tmp) $$i.1) && gzip -f $$i.1; \
-	done
-	rm $(vtmp) $(tmp)
+default: ${MANPAGES}
 
-html-manpages:
-	echo "\setVersion{`cat ../VERSION`}" > $(vtmp)
-	echo "\setDate{`date +"%B, %Y"`}" >> $(vtmp)
-	for i in $(targets); do \
-	  (cat $(hdr) $(vtmp) $$i.latex2man $(ftr) > $(tmp) && \
-	   ${LATEX2MAN} -H -t $(macros) $(tmp) $$i.html); \
-	done
-	rm $(vtmp) $(tmp)
+%.1: %.1.md
+	@- if test "$(PANDOC)" = "no" ; then \
+	     echo "Skipping manpage generation; using pregenerated copy."; \
+	   else \
+	     $(PANDOC) -s -o $@ $<; \
+	   fi
 
-latex-manpages:
-	echo "\setVersion{`cat ../VERSION`}" > $(vtmp)
-	echo "\setDate{`date +"%B, %Y"`}" >> $(vtmp)
-	for i in $(targets); do \
-	  (cat $(hdr) $(vtmp) $$i.latex2man $(ftr) > $(tmp) && \
-	   ${LATEX2MAN} -L $(tmp) $$i.tex) && \
-	   echo '\\end{document}' >> $$i.tex; \
-	done
-	rm $(vtmp) $(tmp)
+%.1.gz: %.1
+	gzip --force --keep $<
+
+install: ${MANPAGES}
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
+	${INSTALL_DATA} ${MANPAGES} $(DESTDIR)$(mandir)/man1
+
+uninstall:
+	cd $(DESTDIR)$(mandir)/man1 && rm -f ${MANPAGES}
 
 clean:
-	for i in $(targets); do \
-	  rm -f $$i.tex $$i.html; \
-	done
+	rm -f *.1.gz
 
 distclean: clean
-	for i in $(targets); do \
-	  rm -f $$i.1.gz; \
-	done
-
-.PHONY: default clean distclean
+	rm -f Makefile
