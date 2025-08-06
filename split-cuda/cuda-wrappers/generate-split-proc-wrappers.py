@@ -198,7 +198,7 @@ def emit_wrapper(decl, ret_type, fnc, args, arg_vars, logging):
     print("  fatCubinHandle = __cudaRegisterFatBinary(global_fatCubin);")
 
   print("  DMTCP_PLUGIN_DISABLE_CKPT();")
-  print("  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);")
+  print("  JUMP_TO_LOWER_HALF(lh_info->fsaddr);")
   if ret_type != "void":
     print("  ret_val = "
           "REAL_FNC(" + strip_fnc(fnc) + ")(" + ", ".join(arg_vars) + ");")

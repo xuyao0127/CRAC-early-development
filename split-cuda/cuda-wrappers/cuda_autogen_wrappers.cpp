@@ -11,8 +11,8 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 #include "dmtcp.h"
-#include "common.h"
-#include "switch_context.h"
+#include "switch-context.h"
+#include "lower-half-api.h"
 #include "upper-half-wrappers.h"
 #include "upper-half-cuda-wrappers.h"
 #include "cuda_autogen_wrappers.h"
@@ -24,7 +24,7 @@ extern "C" cudaError_t cudaCreateTextureObject(cudaTextureObject_t * pTexObject,
   typedef cudaError_t (*cudaCreateTextureObject_t)(cudaTextureObject_t * pTexObject, const struct cudaResourceDesc * pResDesc, const struct cudaTextureDesc * pTexDesc, const struct cudaResourceViewDesc * pResViewDesc);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaCreateTextureObject)(pTexObject, pResDesc, pTexDesc, pResViewDesc);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -39,7 +39,7 @@ extern "C" cudaError_t cudaDestroyTextureObject(cudaTextureObject_t texObject) {
   typedef cudaError_t (*cudaDestroyTextureObject_t)(cudaTextureObject_t texObject);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDestroyTextureObject)(texObject);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -54,7 +54,7 @@ extern "C" cudaChannelFormatDesc cudaCreateChannelDesc ( int  x, int  y, int  z,
   typedef cudaChannelFormatDesc (*cudaCreateChannelDesc_t)( int  x, int  y, int  z, int  w, cudaChannelFormatKind f );
   cudaChannelFormatDesc ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaCreateChannelDesc)(x, y, z, w, f);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -70,7 +70,7 @@ extern "C" cudaError_t cudaEventCreate(cudaEvent_t * event) {
   typedef cudaError_t (*cudaEventCreate_t)(cudaEvent_t * event);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventCreate)(event);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -85,7 +85,7 @@ extern "C" cudaError_t cudaEventCreateWithFlags(cudaEvent_t * event, unsigned in
   typedef cudaError_t (*cudaEventCreateWithFlags_t)(cudaEvent_t * event, unsigned int flags);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventCreateWithFlags)(event, flags);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -100,7 +100,7 @@ extern "C" cudaError_t cudaEventDestroy(cudaEvent_t event) {
   typedef cudaError_t (*cudaEventDestroy_t)(cudaEvent_t event);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventDestroy)(event);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -115,7 +115,7 @@ extern "C" cudaError_t cudaEventElapsedTime(float * ms, cudaEvent_t start, cudaE
   typedef cudaError_t (*cudaEventElapsedTime_t)(float * ms, cudaEvent_t start, cudaEvent_t end);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventElapsedTime)(ms, start, end);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -128,7 +128,7 @@ extern "C" cudaError_t cudaEventQuery(cudaEvent_t event) {
   typedef cudaError_t (*cudaEventQuery_t)(cudaEvent_t event);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventQuery)(event);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -141,7 +141,7 @@ extern "C" cudaError_t cudaEventRecord(cudaEvent_t event, cudaStream_t stream) {
   typedef cudaError_t (*cudaEventRecord_t)(cudaEvent_t event, cudaStream_t stream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventRecord)(event, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -154,7 +154,7 @@ extern "C" cudaError_t cudaEventSynchronize(cudaEvent_t event) {
   typedef cudaError_t (*cudaEventSynchronize_t)(cudaEvent_t event);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaEventSynchronize)(event);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -168,7 +168,7 @@ extern "C" cudaError_t cudaMalloc(void ** pointer, size_t size) {
   typedef cudaError_t (*cudaMalloc_t)(void ** pointer, size_t size);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMalloc)(pointer, size);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -183,7 +183,7 @@ extern "C" cudaError_t cudaFree ( void * pointer ) {
   typedef cudaError_t (*cudaFree_t)( void * pointer );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaFree)(pointer);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -199,7 +199,7 @@ extern "C" cudaError_t cudaMallocArray(struct cudaArray ** array, const struct c
   typedef cudaError_t (*cudaMallocArray_t)(struct cudaArray ** array, const struct cudaChannelFormatDesc * desc, size_t width, size_t height, unsigned int flags);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMallocArray)(array, desc, width, height, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -213,7 +213,7 @@ extern "C" cudaError_t cudaFreeArray(struct cudaArray * array) {
   typedef cudaError_t (*cudaFreeArray_t)(struct cudaArray * array);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaFreeArray)(array);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -227,7 +227,7 @@ extern "C" cudaError_t cudaHostRegister ( void* ptr, size_t size, unsigned int  
   typedef cudaError_t (*cudaHostRegister_t)( void* ptr, size_t size, unsigned int  flags );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaHostRegister)(ptr, size, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -240,7 +240,7 @@ extern "C" cudaError_t cudaDeviceGetAttribute ( int* value, cudaDeviceAttr attr,
   typedef cudaError_t (*cudaDeviceGetAttribute_t)( int* value, cudaDeviceAttr attr, int  device );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceGetAttribute)(value, attr, device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -254,7 +254,7 @@ extern "C" cudaError_t cudaMallocHost ( void ** ptr , size_t size ) {
   typedef cudaError_t (*cudaMallocHost_t)( void ** ptr , size_t size );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMallocHost)(ptr, size);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -268,7 +268,7 @@ extern "C" cudaError_t cudaFreeHost ( void* ptr ) {
   typedef cudaError_t (*cudaFreeHost_t)( void* ptr );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaFreeHost)(ptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -282,7 +282,7 @@ extern "C" cudaError_t cudaHostAlloc ( void ** ptr , size_t size , unsigned int 
   typedef cudaError_t (*cudaHostAlloc_t)( void ** ptr , size_t size , unsigned int flags );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaHostAlloc)(ptr, size, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -296,7 +296,7 @@ extern "C" cudaError_t cudaMallocPitch(void ** devPtr, size_t * pitch, size_t wi
   typedef cudaError_t (*cudaMallocPitch_t)(void ** devPtr, size_t * pitch, size_t width, size_t height);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMallocPitch)(devPtr, pitch, width, height);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -310,7 +310,7 @@ extern "C" cudaError_t cudaGetDevice(int * device) {
   typedef cudaError_t (*cudaGetDevice_t)(int * device);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaGetDevice)(device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -323,7 +323,7 @@ extern "C" cudaError_t cudaSetDevice(int device) {
   typedef cudaError_t (*cudaSetDevice_t)(int device);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaSetDevice)(device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -336,7 +336,7 @@ extern "C" cudaError_t cudaDeviceGetLimit ( size_t* pValue, cudaLimit limit ) {
   typedef cudaError_t (*cudaDeviceGetLimit_t)( size_t* pValue, cudaLimit limit );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceGetLimit)(pValue, limit);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -349,7 +349,7 @@ extern "C" cudaError_t cudaDeviceSetLimit ( cudaLimit limit, size_t value ) {
   typedef cudaError_t (*cudaDeviceSetLimit_t)( cudaLimit limit, size_t value );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceSetLimit)(limit, value);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -362,7 +362,7 @@ extern "C" cudaError_t cudaGetDeviceCount(int * count) {
   typedef cudaError_t (*cudaGetDeviceCount_t)(int * count);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaGetDeviceCount)(count);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -375,7 +375,7 @@ extern "C" cudaError_t cudaDeviceSetCacheConfig ( cudaFuncCache cacheConfig ) {
   typedef cudaError_t (*cudaDeviceSetCacheConfig_t)( cudaFuncCache cacheConfig );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceSetCacheConfig)(cacheConfig);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -388,7 +388,7 @@ extern "C" cudaError_t cudaGetDeviceProperties_v2 ( cudaDeviceProp* prop, int  d
   typedef cudaError_t (*cudaGetDeviceProperties_v2_t)( cudaDeviceProp* prop, int  device );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaGetDeviceProperties_v2)(prop, device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -401,7 +401,7 @@ extern "C" cudaError_t cudaDeviceCanAccessPeer(int * canAccessPeer, int device, 
   typedef cudaError_t (*cudaDeviceCanAccessPeer_t)(int * canAccessPeer, int device, int peerDevice);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceCanAccessPeer)(canAccessPeer, device, peerDevice);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -414,7 +414,7 @@ extern "C" cudaError_t cudaDeviceGetPCIBusId(char * pciBusId, int len, int devic
   typedef cudaError_t (*cudaDeviceGetPCIBusId_t)(char * pciBusId, int len, int device);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceGetPCIBusId)(pciBusId, len, device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -428,7 +428,7 @@ extern "C" cudaError_t cudaDeviceReset() {
   typedef cudaError_t (*cudaDeviceReset_t)();
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceReset)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -441,7 +441,7 @@ extern "C" cudaError_t cudaDeviceSynchronize() {
   typedef cudaError_t (*cudaDeviceSynchronize_t)();
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaDeviceSynchronize)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -456,7 +456,7 @@ extern "C" cudaError_t cudaLaunchKernel ( const void* func, dim3 gridDim, dim3 b
   typedef cudaError_t (*cudaLaunchKernel_t)( const void* func, dim3 gridDim, dim3 blockDim, void** args, size_t sharedMem, cudaStream_t stream );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaLaunchKernel)(func, gridDim, blockDim, args, sharedMem, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -471,7 +471,7 @@ extern "C" cudaError_t cudaMallocManaged ( void** devPtr, size_t size, unsigned 
   typedef cudaError_t (*cudaMallocManaged_t)( void** devPtr, size_t size, unsigned int  flags);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMallocManaged)(devPtr, size, flags);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -487,7 +487,7 @@ extern "C" cudaError_t cudaMemcpy ( void* dst, const void* src, size_t count, cu
   typedef cudaError_t (*cudaMemcpy_t)( void* dst, const void* src, size_t count, cudaMemcpyKind kind );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemcpy)(dst, src, count, kind);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -500,7 +500,7 @@ extern "C" cudaError_t cudaMemcpy2D ( void* dst, size_t dpitch, const void* src,
   typedef cudaError_t (*cudaMemcpy2D_t)( void* dst, size_t dpitch, const void* src, size_t spitch, size_t width, size_t height, cudaMemcpyKind kind );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemcpy2D)(dst, dpitch, src, spitch, width, height, kind);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -513,7 +513,7 @@ extern "C" cudaError_t cudaMemcpyToSymbol ( const void* symbol, const void* src,
   typedef cudaError_t (*cudaMemcpyToSymbol_t)( const void* symbol, const void* src, size_t count, size_t offset, cudaMemcpyKind kind);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemcpyToSymbol)(symbol, src, count, offset, kind);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -526,7 +526,7 @@ extern "C" cudaError_t cudaMemcpyAsync ( void* dst, const void* src, size_t coun
   typedef cudaError_t (*cudaMemcpyAsync_t)( void* dst, const void* src, size_t count, cudaMemcpyKind kind, cudaStream_t stream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemcpyAsync)(dst, src, count, kind, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -539,7 +539,7 @@ extern "C" cudaError_t cudaMemset(void * devPtr, int value, size_t count) {
   typedef cudaError_t (*cudaMemset_t)(void * devPtr, int value, size_t count);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemset)(devPtr, value, count);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -552,7 +552,7 @@ extern "C" cudaError_t cudaMemset2D ( void* devPtr, size_t pitch, int value, siz
   typedef cudaError_t (*cudaMemset2D_t)( void* devPtr, size_t pitch, int value, size_t width, size_t height );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemset2D)(devPtr, pitch, value, width, height);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -565,7 +565,7 @@ extern "C" cudaError_t cudaMemsetAsync(void * devPtr, int value, size_t count, c
   typedef cudaError_t (*cudaMemsetAsync_t)(void * devPtr, int value, size_t count, cudaStream_t stream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemsetAsync)(devPtr, value, count, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -578,7 +578,7 @@ extern "C" cudaError_t cudaMemGetInfo(size_t * free, size_t * total) {
   typedef cudaError_t (*cudaMemGetInfo_t)(size_t * free, size_t * total);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemGetInfo)(free, total);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -591,7 +591,7 @@ extern "C" cudaError_t cudaMemAdvise(const void * devPtr, size_t count, enum cud
   typedef cudaError_t (*cudaMemAdvise_t)(const void * devPtr, size_t count, enum cudaMemoryAdvise advice, int device);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemAdvise)(devPtr, count, advice, device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -604,7 +604,7 @@ extern "C" cudaError_t cudaMemPrefetchAsync(const void * devPtr, size_t count, i
   typedef cudaError_t (*cudaMemPrefetchAsync_t)(const void * devPtr, size_t count, int dstDevice, cudaStream_t stream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaMemPrefetchAsync)(devPtr, count, dstDevice, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -619,7 +619,7 @@ extern "C" cudaError_t cudaStreamCreate(cudaStream_t * pStream) {
   typedef cudaError_t (*cudaStreamCreate_t)(cudaStream_t * pStream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaStreamCreate)(pStream);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -634,7 +634,7 @@ extern "C" cudaError_t cudaStreamCreateWithPriority ( cudaStream_t* pStream, uns
   typedef cudaError_t (*cudaStreamCreateWithPriority_t)( cudaStream_t* pStream, unsigned int  flags, int  priority );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaStreamCreateWithPriority)(pStream, flags, priority);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -649,7 +649,7 @@ extern "C" cudaError_t cudaStreamCreateWithFlags(cudaStream_t * pStream, unsigne
   typedef cudaError_t (*cudaStreamCreateWithFlags_t)(cudaStream_t * pStream, unsigned int flags);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaStreamCreateWithFlags)(pStream, flags);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -664,7 +664,7 @@ extern "C" cudaError_t cudaStreamDestroy(cudaStream_t stream) {
   typedef cudaError_t (*cudaStreamDestroy_t)(cudaStream_t stream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaStreamDestroy)(stream);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -679,7 +679,7 @@ extern "C" cudaError_t cudaStreamSynchronize(cudaStream_t stream) {
   typedef cudaError_t (*cudaStreamSynchronize_t)(cudaStream_t stream);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaStreamSynchronize)(stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -692,7 +692,7 @@ extern "C" cudaError_t cudaStreamWaitEvent(cudaStream_t stream, cudaEvent_t even
   typedef cudaError_t (*cudaStreamWaitEvent_t)(cudaStream_t stream, cudaEvent_t event, unsigned int flags);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaStreamWaitEvent)(stream, event, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -706,7 +706,7 @@ extern "C" cudaError_t cudaThreadSynchronize () {
   typedef cudaError_t (*cudaThreadSynchronize_t)();
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaThreadSynchronize)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -719,7 +719,7 @@ extern "C" cudaError_t cudaThreadExit () {
   typedef cudaError_t (*cudaThreadExit_t)();
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaThreadExit)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -733,7 +733,7 @@ extern "C" cudaError_t cudaPointerGetAttributes ( cudaPointerAttributes* attribu
   typedef cudaError_t (*cudaPointerGetAttributes_t)( cudaPointerAttributes* attributes, const void* ptr );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaPointerGetAttributes)(attributes, ptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -746,7 +746,7 @@ extern "C" const char* cudaGetErrorString ( cudaError_t error ) {
   typedef const char* (*cudaGetErrorString_t)( cudaError_t error );
   const char* ret_val = NULL;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaGetErrorString)(error);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -759,7 +759,7 @@ extern "C" const char* cudaGetErrorName ( cudaError_t error ) {
   typedef const char* (*cudaGetErrorName_t)( cudaError_t error );
   const char* ret_val = NULL;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaGetErrorName)(error);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -772,7 +772,7 @@ extern "C" cudaError_t cudaGetLastError() {
   typedef cudaError_t (*cudaGetLastError_t)();
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaGetLastError)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -785,7 +785,7 @@ extern "C" cudaError_t cudaPeekAtLastError() {
   typedef cudaError_t (*cudaPeekAtLastError_t)();
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaPeekAtLastError)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -798,7 +798,7 @@ extern "C" cudaError_t cudaFuncSetCacheConfig ( const void* func, cudaFuncCache 
   typedef cudaError_t (*cudaFuncSetCacheConfig_t)( const void* func, cudaFuncCache cacheConfig );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaFuncSetCacheConfig)(func, cacheConfig);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -812,7 +812,7 @@ extern "C" char __cudaInitModule(void **fatCubinHandle) {
   typedef char (*__cudaInitModule_t)(void **fatCubinHandle);
   char ret_val = 0;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(__cudaInitModule)(fatCubinHandle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -827,7 +827,7 @@ extern "C" cudaError_t __cudaPopCallConfiguration( dim3 *gridDim, dim3 *blockDim
   typedef cudaError_t (*__cudaPopCallConfiguration_t)( dim3 *gridDim, dim3 *blockDim, size_t *sharedMem, void *stream );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(__cudaPopCallConfiguration)(gridDim, blockDim, sharedMem, stream);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -842,7 +842,7 @@ extern "C" unsigned int __cudaPushCallConfiguration( dim3 gridDim, dim3 blockDim
   typedef unsigned int (*__cudaPushCallConfiguration_t)( dim3 gridDim, dim3 blockDim, size_t sharedMem, void * stream );
   unsigned int ret_val = 0;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(__cudaPushCallConfiguration)(gridDim, blockDim, sharedMem, stream);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -858,7 +858,7 @@ extern "C" void** __cudaRegisterFatBinary(void *fatCubin) {
   void** ret_val = NULL;
   global_fatCubin = fatCubin;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(__cudaRegisterFatBinary)(fatCubin);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -873,7 +873,7 @@ extern "C" void __cudaUnregisterFatBinary(void **fatCubinHandle) {
   typedef void (*__cudaUnregisterFatBinary_t)(void **fatCubinHandle);
   fatCubinHandle = __cudaRegisterFatBinary(global_fatCubin);
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   REAL_FNC(__cudaUnregisterFatBinary)(fatCubinHandle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -886,7 +886,7 @@ extern "C" void __cudaUnregisterFatBinary(void **fatCubinHandle) {
 extern "C" void __cudaRegisterFunction( void **fatCubinHandle, const char *hostFun, char *deviceFun, const char *deviceName, int thread_limit, uint3 *tid, uint3 *bid, dim3 *bDim, dim3 *gDim, int *wSize ) {
   typedef void (*__cudaRegisterFunction_t)( void **fatCubinHandle, const char *hostFun, char *deviceFun, const char *deviceName, int thread_limit, uint3 *tid, uint3 *bid, dim3 *bDim, dim3 *gDim, int *wSize );
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   REAL_FNC(__cudaRegisterFunction)(fatCubinHandle, hostFun, deviceFun, deviceName, thread_limit, tid, bid, bDim, gDim, wSize);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -899,7 +899,7 @@ extern "C" void __cudaRegisterFunction( void **fatCubinHandle, const char *hostF
 extern "C" void __cudaRegisterManagedVar( void **fatCubinHandle, void **hostVarPtrAddress, char  *deviceAddress, const char  *deviceName, int    ext, size_t size, int    constant, int    global ) {
   typedef void (*__cudaRegisterManagedVar_t)( void **fatCubinHandle, void **hostVarPtrAddress, char  *deviceAddress, const char  *deviceName, int    ext, size_t size, int    constant, int    global );
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   REAL_FNC(__cudaRegisterManagedVar)(fatCubinHandle, hostVarPtrAddress, deviceAddress, deviceName, ext, size, constant, global);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -912,7 +912,7 @@ extern "C" void __cudaRegisterManagedVar( void **fatCubinHandle, void **hostVarP
 extern "C" void __cudaRegisterVar(void **fatCubinHandle, char *hostVar, char  *deviceAddress, const char  *deviceName, int ext, size_t size, int constant, int global) {
   typedef void (*__cudaRegisterVar_t)(void **fatCubinHandle, char *hostVar, char  *deviceAddress, const char  *deviceName, int ext, size_t size, int constant, int global);
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   REAL_FNC(__cudaRegisterVar)(fatCubinHandle, hostVar, deviceAddress, deviceName, ext, size, constant, global);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -926,7 +926,7 @@ extern "C" cudaError_t cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags ( 
   typedef cudaError_t (*cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_t)( int* numBlocks, const void* func, int  blockSize, size_t dynamicSMemSize, unsigned int  flags );
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags)(numBlocks, func, blockSize, dynamicSMemSize, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -939,7 +939,7 @@ extern "C" cudaError_t cudaFuncGetAttributes(struct cudaFuncAttributes *attr, co
   typedef cudaError_t (*cudaFuncGetAttributes_t)(struct cudaFuncAttributes *attr, const void *func);
   cudaError_t ret_val = cudaSuccess;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cudaFuncGetAttributes)(attr, func);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -953,7 +953,7 @@ extern "C" cublasStatus_t cublasCreate_v2(cublasHandle_t * handle) {
   typedef cublasStatus_t (*cublasCreate_v2_t)(cublasHandle_t * handle);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasCreate_v2)(handle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -968,7 +968,7 @@ extern "C" cublasStatus_t cublasSetStream_v2(cublasHandle_t handle, cudaStream_t
   typedef cublasStatus_t (*cublasSetStream_v2_t)(cublasHandle_t handle, cudaStream_t streamId);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasSetStream_v2)(handle, streamId);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -981,7 +981,7 @@ extern "C" cublasStatus_t cublasDdot_v2(cublasHandle_t handle, int n, const doub
   typedef cublasStatus_t (*cublasDdot_v2_t)(cublasHandle_t handle, int n, const double * x, int incx, const double * y, int incy, double * result);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDdot_v2)(handle, n, x, incx, y, incy, result);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -994,7 +994,7 @@ extern "C" cublasStatus_t cublasDestroy_v2(cublasHandle_t handle) {
   typedef cublasStatus_t (*cublasDestroy_v2_t)(cublasHandle_t handle);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDestroy_v2)(handle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1009,7 +1009,7 @@ extern "C" cublasStatus_t cublasDaxpy_v2(cublasHandle_t handle, int n, const dou
   typedef cublasStatus_t (*cublasDaxpy_v2_t)(cublasHandle_t handle, int n, const double * alpha, const double * x, int incx, double * y, int incy);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDaxpy_v2)(handle, n, alpha, x, incx, y, incy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1022,7 +1022,7 @@ extern "C" cublasStatus_t cublasDasum_v2(cublasHandle_t handle, int n, const dou
   typedef cublasStatus_t (*cublasDasum_v2_t)(cublasHandle_t handle, int n, const double *x, int incx, double *result);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDasum_v2)(handle, n, x, incx, result);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1035,7 +1035,7 @@ extern "C" cublasStatus_t cublasDgemm_v2 (cublasHandle_t handle, cublasOperation
   typedef cublasStatus_t (*cublasDgemm_v2_t)(cublasHandle_t handle, cublasOperation_t transa, cublasOperation_t transb, int m, int n, int k, const double *alpha, const double *A, int lda, const double *B, int ldb, const double *beta, double *C, int ldc);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDgemm_v2)(handle, transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1048,7 +1048,7 @@ extern "C" cublasStatus_t cublasDgemv_v2 (cublasHandle_t handle, cublasOperation
   typedef cublasStatus_t (*cublasDgemv_v2_t)(cublasHandle_t handle, cublasOperation_t trans, int m, int n, const double *alpha, const double *A, int lda, const double *x, int incx, const double *beta, double *y, int incy);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDgemv_v2)(handle, trans, m, n, alpha, A, lda, x, incx, beta, y, incy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1061,7 +1061,7 @@ extern "C" cublasStatus_t cublasDnrm2_v2(cublasHandle_t handle, int n, const dou
   typedef cublasStatus_t (*cublasDnrm2_v2_t)(cublasHandle_t handle, int n, const double *x, int incx, double *result);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDnrm2_v2)(handle, n, x, incx, result);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1074,7 +1074,7 @@ extern "C" cublasStatus_t cublasDscal_v2(cublasHandle_t handle, int n, const dou
   typedef cublasStatus_t (*cublasDscal_v2_t)(cublasHandle_t handle, int n, const double *alpha, double *x, int incx);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDscal_v2)(handle, n, alpha, x, incx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1087,7 +1087,7 @@ extern "C" cublasStatus_t cublasDswap_v2 (cublasHandle_t handle, int n, double *
   typedef cublasStatus_t (*cublasDswap_v2_t)(cublasHandle_t handle, int n, double *x, int incx, double *y, int incy);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasDswap_v2)(handle, n, x, incx, y, incy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1100,7 +1100,7 @@ extern "C" cublasStatus_t cublasIdamax_v2(cublasHandle_t handle, int n, const do
   typedef cublasStatus_t (*cublasIdamax_v2_t)(cublasHandle_t handle, int n, const double *x, int incx, int *result);
   cublasStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cublasIdamax_v2)(handle, n, x, incx, result);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1114,7 +1114,7 @@ extern "C" cusparseStatus_t cusparseCreate(cusparseHandle_t *handle) {
   typedef cusparseStatus_t (*cusparseCreate_t)(cusparseHandle_t *handle);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCreate)(handle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1129,7 +1129,7 @@ extern "C" cusparseStatus_t cusparseSetStream(cusparseHandle_t handle, cudaStrea
   typedef cusparseStatus_t (*cusparseSetStream_t)(cusparseHandle_t handle, cudaStream_t streamId);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseSetStream)(handle, streamId);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1142,7 +1142,7 @@ extern "C" cusparseStatus_t cusparseCreateMatDescr(cusparseMatDescr_t *descrA) {
   typedef cusparseStatus_t (*cusparseCreateMatDescr_t)(cusparseMatDescr_t *descrA);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCreateMatDescr)(descrA);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1157,7 +1157,7 @@ extern "C" cusparseStatus_t cusparseSetMatType(cusparseMatDescr_t descrA, cuspar
   typedef cusparseStatus_t (*cusparseSetMatType_t)(cusparseMatDescr_t descrA, cusparseMatrixType_t type);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseSetMatType)(descrA, type);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1170,7 +1170,7 @@ extern "C" cusparseStatus_t cusparseSetMatIndexBase(cusparseMatDescr_t descrA, c
   typedef cusparseStatus_t (*cusparseSetMatIndexBase_t)(cusparseMatDescr_t descrA, cusparseIndexBase_t base);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseSetMatIndexBase)(descrA, base);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1183,7 +1183,7 @@ extern "C" cusparseStatus_t cusparseDestroy(cusparseHandle_t handle) {
   typedef cusparseStatus_t (*cusparseDestroy_t)(cusparseHandle_t handle);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDestroy)(handle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1198,7 +1198,7 @@ extern "C" cusparseStatus_t cusparseDestroyMatDescr (cusparseMatDescr_t descrA) 
   typedef cusparseStatus_t (*cusparseDestroyMatDescr_t)(cusparseMatDescr_t descrA);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDestroyMatDescr)(descrA);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1214,7 +1214,7 @@ extern "C" cusparseStatus_t cusparseCreateCsric02Info(csric02Info_t *info) {
   typedef cusparseStatus_t (*cusparseCreateCsric02Info_t)(csric02Info_t *info);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCreateCsric02Info)(info);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1229,7 +1229,7 @@ extern "C" cusparseStatus_t cusparseDestroyCsric02Info(csric02Info_t info) {
   typedef cusparseStatus_t (*cusparseDestroyCsric02Info_t)(csric02Info_t info);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDestroyCsric02Info)(info);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1244,7 +1244,7 @@ extern "C" cusparseStatus_t cusparseCreateCsrilu02Info(csrilu02Info_t *info) {
   typedef cusparseStatus_t (*cusparseCreateCsrilu02Info_t)(csrilu02Info_t *info);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCreateCsrilu02Info)(info);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1259,7 +1259,7 @@ extern "C" cusparseStatus_t cusparseDestroyCsrilu02Info(csrilu02Info_t info) {
   typedef cusparseStatus_t (*cusparseDestroyCsrilu02Info_t)(csrilu02Info_t info);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDestroyCsrilu02Info)(info);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1274,7 +1274,7 @@ extern "C" cusparseStatus_t cusparseCreateBsrsv2Info(bsrsv2Info_t *info) {
   typedef cusparseStatus_t (*cusparseCreateBsrsv2Info_t)(bsrsv2Info_t *info);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCreateBsrsv2Info)(info);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1289,7 +1289,7 @@ extern "C" cusparseStatus_t cusparseDestroyBsrsv2Info(bsrsv2Info_t info) {
   typedef cusparseStatus_t (*cusparseDestroyBsrsv2Info_t)(bsrsv2Info_t info);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDestroyBsrsv2Info)(info);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1304,7 +1304,7 @@ extern "C" cusparseStatus_t cusparseCsr2cscEx2_bufferSize(cusparseHandle_t handl
   typedef cusparseStatus_t (*cusparseCsr2cscEx2_bufferSize_t)(cusparseHandle_t handle, 			     int m, 			     int n, 			     int nnz, 			     const void* csrVal, 			     const int* csrRowPtr, 			     const int* csrColInd, 			     void* cscVal, 			     int* cscColPtr, 			     int* cscRowInd, 			     cudaDataType valType, 			     cusparseAction_t copyValues, 			     cusparseIndexBase_t idxBase, 			     cusparseCsr2CscAlg_t alg, 			     size_t* bufferSize);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCsr2cscEx2_bufferSize)(handle, m, n, nnz, csrVal, csrRowPtr, csrColInd, cscVal, cscColPtr, cscRowInd, valType, copyValues, idxBase, alg, bufferSize);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1317,7 +1317,7 @@ extern "C" cusparseStatus_t cusparseCsr2cscEx2(cusparseHandle_t handle, 		  int 
   typedef cusparseStatus_t (*cusparseCsr2cscEx2_t)(cusparseHandle_t handle, 		  int m, 		  int n, 		  int nnz, 		  const void* csrVal, 		  const int* csrRowPtr, 		  const int* csrColInd, 		  void* cscVal, 		  int* cscColPtr, 		  int* cscRowInd, 		  cudaDataType valType, 		  cusparseAction_t copyValues, 		  cusparseIndexBase_t idxBase, 		  cusparseCsr2CscAlg_t alg, 		  void* buffer);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseCsr2cscEx2)(handle, m, n, nnz, csrVal, csrRowPtr, csrColInd, cscVal, cscColPtr, cscRowInd, valType, copyValues, idxBase, alg, buffer);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1330,7 +1330,7 @@ extern "C" cusparseStatus_t cusparseDgemvi_bufferSize(cusparseHandle_t handle, 	
   typedef cusparseStatus_t (*cusparseDgemvi_bufferSize_t)(cusparseHandle_t handle, 			 cusparseOperation_t transA, 			 int m, 			 int n, 			 int nnz, 			 int* pBufferSize);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDgemvi_bufferSize)(handle, transA, m, n, nnz, pBufferSize);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1343,7 +1343,7 @@ extern "C" cusparseStatus_t cusparseDgemvi(cusparseHandle_t handle, 	      cuspa
   typedef cusparseStatus_t (*cusparseDgemvi_t)(cusparseHandle_t handle, 	      cusparseOperation_t transA, 	      int m, 	      int n, 	      const double* alpha, 	      const double* A, 	      int lda, 	      int nnz, 	      const double* x, 	      const int* xInd, 	      const double* beta, 	      double* y, 	      cusparseIndexBase_t idxBase, 	      void* pBuffer);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDgemvi)(handle, transA, m, n, alpha, A, lda, nnz, x, xInd, beta, y, idxBase, pBuffer);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1356,7 +1356,7 @@ extern "C" cusparseStatus_t cusparseDbsrsv2_analysis(cusparseHandle_t handle, 		
   typedef cusparseStatus_t (*cusparseDbsrsv2_analysis_t)(cusparseHandle_t handle, 			cusparseDirection_t dirA, 			cusparseOperation_t transA, 			int mb, 			int nnzb, 			const cusparseMatDescr_t descrA, 			const double* bsrValA, 			const int* bsrRowPtrA, 			const int* bsrColIndA, 			int blockDim, 			bsrsv2Info_t info, 			cusparseSolvePolicy_t policy, 			void* pBuffer);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDbsrsv2_analysis)(handle, dirA, transA, mb, nnzb, descrA, bsrValA, bsrRowPtrA, bsrColIndA, blockDim, info, policy, pBuffer);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1369,7 +1369,7 @@ extern "C" cusparseStatus_t cusparseDbsrsv2_solve(cusparseHandle_t handle, 		   
   typedef cusparseStatus_t (*cusparseDbsrsv2_solve_t)(cusparseHandle_t handle, 		     cusparseDirection_t dirA, 		     cusparseOperation_t transA, 		     int mb, 		     int nnzb, 		     const double* alpha, 		     const cusparseMatDescr_t descrA, 		     const double* bsrValA, 		     const int* bsrRowPtrA, 		     const int* bsrColIndA, 		     int blockDim, 		     bsrsv2Info_t info, 		     const double* x, 		     double* y, 		     cusparseSolvePolicy_t policy, 		     void* pBuffer);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseDbsrsv2_solve)(handle, dirA, transA, mb, nnzb, alpha, descrA, bsrValA, bsrRowPtrA, bsrColIndA, blockDim, info, x, y, policy, pBuffer);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1382,7 +1382,7 @@ extern "C" cusparseMatrixType_t cusparseGetMatType(const cusparseMatDescr_t desc
   typedef cusparseMatrixType_t (*cusparseGetMatType_t)(const cusparseMatDescr_t descrA);
   cusparseMatrixType_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseGetMatType)(descrA);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1395,7 +1395,7 @@ extern "C" cusparseStatus_t cusparseSetMatFillMode(cusparseMatDescr_t descrA, cu
   typedef cusparseStatus_t (*cusparseSetMatFillMode_t)(cusparseMatDescr_t descrA, cusparseFillMode_t fillMode);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseSetMatFillMode)(descrA, fillMode);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1408,7 +1408,7 @@ extern "C" cusparseFillMode_t cusparseGetMatFillMode(const cusparseMatDescr_t de
   typedef cusparseFillMode_t (*cusparseGetMatFillMode_t)(const cusparseMatDescr_t descrA);
   cusparseFillMode_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseGetMatFillMode)(descrA);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1421,7 +1421,7 @@ extern "C" cusparseStatus_t cusparseSetMatDiagType(cusparseMatDescr_t  descrA, c
   typedef cusparseStatus_t (*cusparseSetMatDiagType_t)(cusparseMatDescr_t  descrA, cusparseDiagType_t diagType);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseSetMatDiagType)(descrA, diagType);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1434,7 +1434,7 @@ extern "C" cusparseDiagType_t cusparseGetMatDiagType(const cusparseMatDescr_t de
   typedef cusparseDiagType_t (*cusparseGetMatDiagType_t)(const cusparseMatDescr_t descrA);
   cusparseDiagType_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseGetMatDiagType)(descrA);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1447,7 +1447,7 @@ extern "C" cusparseIndexBase_t cusparseGetMatIndexBase(const cusparseMatDescr_t 
   typedef cusparseIndexBase_t (*cusparseGetMatIndexBase_t)(const cusparseMatDescr_t descrA);
   cusparseIndexBase_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseGetMatIndexBase)(descrA);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1460,7 +1460,7 @@ extern "C" cusparseStatus_t cusparseSetPointerMode(cusparseHandle_t handle, cusp
   typedef cusparseStatus_t (*cusparseSetPointerMode_t)(cusparseHandle_t handle, cusparsePointerMode_t mode);
   cusparseStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusparseSetPointerMode)(handle, mode);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1474,7 +1474,7 @@ extern "C" cusolverStatus_t cusolverDnCreate(cusolverDnHandle_t *handle) {
   typedef cusolverStatus_t (*cusolverDnCreate_t)(cusolverDnHandle_t *handle);
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnCreate)(handle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1489,7 +1489,7 @@ extern "C" cusolverStatus_t cusolverDnDestroy(cusolverDnHandle_t handle) {
   typedef cusolverStatus_t (*cusolverDnDestroy_t)(cusolverDnHandle_t handle);
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDestroy)(handle);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1504,7 +1504,7 @@ extern "C" cusolverStatus_t cusolverDnSetStream (cusolverDnHandle_t handle, cuda
   typedef cusolverStatus_t (*cusolverDnSetStream_t)(cusolverDnHandle_t handle, cudaStream_t streamId);
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnSetStream)(handle, streamId);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1517,7 +1517,7 @@ extern "C" cusolverStatus_t cusolverDnGetStream(cusolverDnHandle_t handle, cudaS
   typedef cusolverStatus_t (*cusolverDnGetStream_t)(cusolverDnHandle_t handle, cudaStream_t *streamId);
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnGetStream)(handle, streamId);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1530,7 +1530,7 @@ extern "C" cusolverStatus_t cusolverDnDgetrf_bufferSize( cusolverDnHandle_t hand
   typedef cusolverStatus_t (*cusolverDnDgetrf_bufferSize_t)( cusolverDnHandle_t handle, int m, int n, double *A, int lda, int *Lwork );
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDgetrf_bufferSize)(handle, m, n, A, lda, Lwork);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1543,7 +1543,7 @@ extern "C" cusolverStatus_t cusolverDnDgetrf( cusolverDnHandle_t handle, int m, 
   typedef cusolverStatus_t (*cusolverDnDgetrf_t)( cusolverDnHandle_t handle, int m, int n, double *A, int lda, double *Workspace, int *devIpiv, int *devInfo );
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDgetrf)(handle, m, n, A, lda, Workspace, devIpiv, devInfo);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1556,7 +1556,7 @@ extern "C" cusolverStatus_t cusolverDnDgetrs( cusolverDnHandle_t handle, cublasO
   typedef cusolverStatus_t (*cusolverDnDgetrs_t)( cusolverDnHandle_t handle, cublasOperation_t trans, int n, int nrhs, const double *A, int lda, const int *devIpiv, double *B, int ldb, int *devInfo );
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDgetrs)(handle, trans, n, nrhs, A, lda, devIpiv, B, ldb, devInfo);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1569,7 +1569,7 @@ extern "C" cusolverStatus_t cusolverDnDpotrf_bufferSize( cusolverDnHandle_t hand
   typedef cusolverStatus_t (*cusolverDnDpotrf_bufferSize_t)( cusolverDnHandle_t handle, cublasFillMode_t uplo, int n, double *A, int lda, int *Lwork );
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDpotrf_bufferSize)(handle, uplo, n, A, lda, Lwork);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1582,7 +1582,7 @@ extern "C" cusolverStatus_t cusolverDnDpotrf( cusolverDnHandle_t handle, cublasF
   typedef cusolverStatus_t (*cusolverDnDpotrf_t)( cusolverDnHandle_t handle, cublasFillMode_t uplo, int n, double *A, int lda, double *Workspace, int Lwork, int *devInfo );
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDpotrf)(handle, uplo, n, A, lda, Workspace, Lwork, devInfo);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1595,7 +1595,7 @@ extern "C" cusolverStatus_t cusolverDnDpotrs( cusolverDnHandle_t handle, cublasF
   typedef cusolverStatus_t (*cusolverDnDpotrs_t)( cusolverDnHandle_t handle, cublasFillMode_t uplo, int n, int nrhs, const double *A, int lda, double *B, int ldb, int *devInfo);
   cusolverStatus_t ret_val ;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cusolverDnDpotrs)(handle, uplo, n, nrhs, A, lda, B, ldb, devInfo);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1610,7 +1610,7 @@ extern "C" CUresult cuInit ( unsigned int  Flags ) {
   typedef CUresult (*cuInit_t)( unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuInit)(Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1624,7 +1624,7 @@ extern "C" CUresult cuDriverGetVersion ( int* driverVersion ) {
   typedef CUresult (*cuDriverGetVersion_t)( int* driverVersion );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDriverGetVersion)(driverVersion);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1639,7 +1639,7 @@ extern "C" CUresult cuDeviceGet ( CUdevice* device, int  ordinal ) {
   typedef CUresult (*cuDeviceGet_t)( CUdevice* device, int  ordinal );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGet)(device, ordinal);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1653,7 +1653,7 @@ extern "C" CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, C
   typedef CUresult (*cuDeviceGetAttribute_t)( int* pi, CUdevice_attribute attrib, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetAttribute)(pi, attrib, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1667,7 +1667,7 @@ extern "C" CUresult cuDeviceGetCount ( int* count ) {
   typedef CUresult (*cuDeviceGetCount_t)( int* count );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetCount)(count);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1682,7 +1682,7 @@ extern "C" CUresult cuDeviceGetName ( char* name, int  len, CUdevice dev ) {
   typedef CUresult (*cuDeviceGetName_t)( char* name, int  len, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetName)(name, len, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1696,7 +1696,7 @@ extern "C" CUresult cuDeviceGetUuid ( CUuuid* uuid, CUdevice dev ) {
   typedef CUresult (*cuDeviceGetUuid_t)( CUuuid* uuid, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetUuid)(uuid, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1711,7 +1711,7 @@ extern "C" CUresult cuDeviceTotalMem_v2 ( size_t* bytes, CUdevice dev ) {
   typedef CUresult (*cuDeviceTotalMem_v2_t)( size_t* bytes, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceTotalMem_v2)(bytes, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1725,7 +1725,7 @@ extern "C" CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice
   typedef CUresult (*cuDeviceComputeCapability_t)( int* major, int* minor, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceComputeCapability)(major, minor, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1739,7 +1739,7 @@ extern "C" CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev ) {
   typedef CUresult (*cuDeviceGetProperties_t)( CUdevprop* prop, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetProperties)(prop, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1754,7 +1754,7 @@ extern "C" CUresult cuDevicePrimaryCtxGetState ( CUdevice dev, unsigned int* fla
   typedef CUresult (*cuDevicePrimaryCtxGetState_t)( CUdevice dev, unsigned int* flags, int* active );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDevicePrimaryCtxGetState)(dev, flags, active);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1768,7 +1768,7 @@ extern "C" CUresult cuDevicePrimaryCtxRelease_v2 ( CUdevice dev ) {
   typedef CUresult (*cuDevicePrimaryCtxRelease_v2_t)( CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDevicePrimaryCtxRelease_v2)(dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1782,7 +1782,7 @@ extern "C" CUresult cuDevicePrimaryCtxReset_v2 ( CUdevice dev ) {
   typedef CUresult (*cuDevicePrimaryCtxReset_v2_t)( CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDevicePrimaryCtxReset_v2)(dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1796,7 +1796,7 @@ extern "C" CUresult cuDevicePrimaryCtxRetain ( CUcontext* pctx, CUdevice dev ) {
   typedef CUresult (*cuDevicePrimaryCtxRetain_t)( CUcontext* pctx, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDevicePrimaryCtxRetain)(pctx, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1810,7 +1810,7 @@ extern "C" CUresult cuDevicePrimaryCtxSetFlags_v2 ( CUdevice dev, unsigned int  
   typedef CUresult (*cuDevicePrimaryCtxSetFlags_v2_t)( CUdevice dev, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDevicePrimaryCtxSetFlags_v2)(dev, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1825,7 +1825,7 @@ extern "C" CUresult cuCtxCreate_v2 ( CUcontext* pctx, unsigned int  flags, CUdev
   typedef CUresult (*cuCtxCreate_v2_t)( CUcontext* pctx, unsigned int  flags, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxCreate_v2)(pctx, flags, dev);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1841,7 +1841,7 @@ extern "C" CUresult cuCtxDestroy_v2 ( CUcontext ctx ) {
   typedef CUresult (*cuCtxDestroy_v2_t)( CUcontext ctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxDestroy_v2)(ctx);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -1857,7 +1857,7 @@ extern "C" CUresult cuCtxGetApiVersion ( CUcontext ctx, unsigned int* version ) 
   typedef CUresult (*cuCtxGetApiVersion_t)( CUcontext ctx, unsigned int* version );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetApiVersion)(ctx, version);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1871,7 +1871,7 @@ extern "C" CUresult cuCtxGetCacheConfig ( CUfunc_cache* pconfig ) {
   typedef CUresult (*cuCtxGetCacheConfig_t)( CUfunc_cache* pconfig );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetCacheConfig)(pconfig);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1885,7 +1885,7 @@ extern "C" CUresult cuCtxGetCurrent ( CUcontext* pctx ) {
   typedef CUresult (*cuCtxGetCurrent_t)( CUcontext* pctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetCurrent)(pctx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1899,7 +1899,7 @@ extern "C" CUresult cuCtxGetDevice ( CUdevice* device ) {
   typedef CUresult (*cuCtxGetDevice_t)( CUdevice* device );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetDevice)(device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1913,7 +1913,7 @@ extern "C" CUresult cuCtxGetFlags ( unsigned int* flags ) {
   typedef CUresult (*cuCtxGetFlags_t)( unsigned int* flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetFlags)(flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1927,7 +1927,7 @@ extern "C" CUresult cuCtxGetLimit ( size_t* pvalue, CUlimit limit ) {
   typedef CUresult (*cuCtxGetLimit_t)( size_t* pvalue, CUlimit limit );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetLimit)(pvalue, limit);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1941,7 +1941,7 @@ extern "C" CUresult cuCtxGetSharedMemConfig ( CUsharedconfig* pConfig ) {
   typedef CUresult (*cuCtxGetSharedMemConfig_t)( CUsharedconfig* pConfig );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetSharedMemConfig)(pConfig);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1955,7 +1955,7 @@ extern "C" CUresult cuCtxGetStreamPriorityRange ( int* leastPriority, int* great
   typedef CUresult (*cuCtxGetStreamPriorityRange_t)( int* leastPriority, int* greatestPriority );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxGetStreamPriorityRange)(leastPriority, greatestPriority);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1969,7 +1969,7 @@ extern "C" CUresult cuCtxPopCurrent_v2 ( CUcontext* pctx ) {
   typedef CUresult (*cuCtxPopCurrent_v2_t)( CUcontext* pctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxPopCurrent_v2)(pctx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1983,7 +1983,7 @@ extern "C" CUresult cuCtxPushCurrent_v2 ( CUcontext ctx ) {
   typedef CUresult (*cuCtxPushCurrent_v2_t)( CUcontext ctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxPushCurrent_v2)(ctx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -1997,7 +1997,7 @@ extern "C" CUresult cuCtxSetCacheConfig ( CUfunc_cache config ) {
   typedef CUresult (*cuCtxSetCacheConfig_t)( CUfunc_cache config );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxSetCacheConfig)(config);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2011,7 +2011,7 @@ extern "C" CUresult cuCtxSetCurrent ( CUcontext ctx ) {
   typedef CUresult (*cuCtxSetCurrent_t)( CUcontext ctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxSetCurrent)(ctx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2025,7 +2025,7 @@ extern "C" CUresult cuCtxSetLimit ( CUlimit limit, size_t value ) {
   typedef CUresult (*cuCtxSetLimit_t)( CUlimit limit, size_t value );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxSetLimit)(limit, value);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2039,7 +2039,7 @@ extern "C" CUresult cuCtxSetSharedMemConfig ( CUsharedconfig config ) {
   typedef CUresult (*cuCtxSetSharedMemConfig_t)( CUsharedconfig config );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxSetSharedMemConfig)(config);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2053,7 +2053,7 @@ extern "C" CUresult cuCtxSynchronize () {
   typedef CUresult (*cuCtxSynchronize_t)();
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxSynchronize)();
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2068,7 +2068,7 @@ extern "C" CUresult cuCtxAttach ( CUcontext* pctx, unsigned int  flags ) {
   typedef CUresult (*cuCtxAttach_t)( CUcontext* pctx, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxAttach)(pctx, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2082,7 +2082,7 @@ extern "C" CUresult cuCtxDetach ( CUcontext ctx ) {
   typedef CUresult (*cuCtxDetach_t)( CUcontext ctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxDetach)(ctx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2097,7 +2097,7 @@ extern "C" CUresult cuLinkAddData_v2 ( CUlinkState state, CUjitInputType type, v
   typedef CUresult (*cuLinkAddData_v2_t)( CUlinkState state, CUjitInputType type, void* data, size_t size, const char* name, unsigned int  numOptions, CUjit_option* options, void** optionValues );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLinkAddData_v2)(state, type, data, size, name, numOptions, options, optionValues);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2111,7 +2111,7 @@ extern "C" CUresult cuLinkAddFile_v2 ( CUlinkState state, CUjitInputType type, c
   typedef CUresult (*cuLinkAddFile_v2_t)( CUlinkState state, CUjitInputType type, const char* path, unsigned int  numOptions, CUjit_option* options, void** optionValues );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLinkAddFile_v2)(state, type, path, numOptions, options, optionValues);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2125,7 +2125,7 @@ extern "C" CUresult cuLinkComplete ( CUlinkState state, void** cubinOut, size_t*
   typedef CUresult (*cuLinkComplete_t)( CUlinkState state, void** cubinOut, size_t* sizeOut );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLinkComplete)(state, cubinOut, sizeOut);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2139,7 +2139,7 @@ extern "C" CUresult cuLinkCreate_v2 ( unsigned int  numOptions, CUjit_option* op
   typedef CUresult (*cuLinkCreate_v2_t)( unsigned int  numOptions, CUjit_option* options, void** optionValues, CUlinkState* stateOut );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLinkCreate_v2)(numOptions, options, optionValues, stateOut);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -2155,7 +2155,7 @@ extern "C" CUresult cuLinkDestroy ( CUlinkState state ) {
   typedef CUresult (*cuLinkDestroy_t)( CUlinkState state );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLinkDestroy)(state);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -2171,7 +2171,7 @@ extern "C" CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, cons
   typedef CUresult (*cuModuleGetFunction_t)( CUfunction* hfunc, CUmodule hmod, const char* name );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleGetFunction)(hfunc, hmod, name);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2185,7 +2185,7 @@ extern "C" CUresult cuModuleGetGlobal_v2 ( CUdeviceptr* dptr, size_t* bytes, CUm
   typedef CUresult (*cuModuleGetGlobal_v2_t)( CUdeviceptr* dptr, size_t* bytes, CUmodule hmod, const char* name );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleGetGlobal_v2)(dptr, bytes, hmod, name);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2199,7 +2199,7 @@ extern "C" CUresult cuModuleGetSurfRef ( CUsurfref* pSurfRef, CUmodule hmod, con
   typedef CUresult (*cuModuleGetSurfRef_t)( CUsurfref* pSurfRef, CUmodule hmod, const char* name );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleGetSurfRef)(pSurfRef, hmod, name);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2213,7 +2213,7 @@ extern "C" CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, const 
   typedef CUresult (*cuModuleGetTexRef_t)( CUtexref* pTexRef, CUmodule hmod, const char* name );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleGetTexRef)(pTexRef, hmod, name);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2227,7 +2227,7 @@ extern "C" CUresult cuModuleLoad ( CUmodule* module, const char* fname ) {
   typedef CUresult (*cuModuleLoad_t)( CUmodule* module, const char* fname );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleLoad)(module, fname);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2241,7 +2241,7 @@ extern "C" CUresult cuModuleLoadData ( CUmodule* module, const void* image ) {
   typedef CUresult (*cuModuleLoadData_t)( CUmodule* module, const void* image );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleLoadData)(module, image);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2255,7 +2255,7 @@ extern "C" CUresult cuModuleLoadDataEx ( CUmodule* module, const void* image, un
   typedef CUresult (*cuModuleLoadDataEx_t)( CUmodule* module, const void* image, unsigned int  numOptions, CUjit_option* options, void** optionValues );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleLoadDataEx)(module, image, numOptions, options, optionValues);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2269,7 +2269,7 @@ extern "C" CUresult cuModuleLoadFatBinary ( CUmodule* module, const void* fatCub
   typedef CUresult (*cuModuleLoadFatBinary_t)( CUmodule* module, const void* fatCubin );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleLoadFatBinary)(module, fatCubin);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2283,7 +2283,7 @@ extern "C" CUresult cuModuleUnload ( CUmodule hmod ) {
   typedef CUresult (*cuModuleUnload_t)( CUmodule hmod );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuModuleUnload)(hmod);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2298,7 +2298,7 @@ extern "C" CUresult cuArray3DCreate_v2 ( CUarray* pHandle, const CUDA_ARRAY3D_DE
   typedef CUresult (*cuArray3DCreate_v2_t)( CUarray* pHandle, const CUDA_ARRAY3D_DESCRIPTOR* pAllocateArray );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuArray3DCreate_v2)(pHandle, pAllocateArray);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -2314,7 +2314,7 @@ extern "C" CUresult cuArray3DGetDescriptor_v2 ( CUDA_ARRAY3D_DESCRIPTOR* pArrayD
   typedef CUresult (*cuArray3DGetDescriptor_v2_t)( CUDA_ARRAY3D_DESCRIPTOR* pArrayDescriptor, CUarray hArray );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuArray3DGetDescriptor_v2)(pArrayDescriptor, hArray);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2328,7 +2328,7 @@ extern "C" CUresult cuArrayCreate_v2 ( CUarray* pHandle, const CUDA_ARRAY_DESCRI
   typedef CUresult (*cuArrayCreate_v2_t)( CUarray* pHandle, const CUDA_ARRAY_DESCRIPTOR* pAllocateArray );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuArrayCreate_v2)(pHandle, pAllocateArray);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -2344,7 +2344,7 @@ extern "C" CUresult cuArrayDestroy ( CUarray hArray ) {
   typedef CUresult (*cuArrayDestroy_t)( CUarray hArray );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuArrayDestroy)(hArray);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -2360,7 +2360,7 @@ extern "C" CUresult cuArrayGetDescriptor_v2 ( CUDA_ARRAY_DESCRIPTOR* pArrayDescr
   typedef CUresult (*cuArrayGetDescriptor_v2_t)( CUDA_ARRAY_DESCRIPTOR* pArrayDescriptor, CUarray hArray );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuArrayGetDescriptor_v2)(pArrayDescriptor, hArray);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2374,7 +2374,7 @@ extern "C" CUresult cuDeviceGetByPCIBusId ( CUdevice* dev, const char* pciBusId 
   typedef CUresult (*cuDeviceGetByPCIBusId_t)( CUdevice* dev, const char* pciBusId );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetByPCIBusId)(dev, pciBusId);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2388,7 +2388,7 @@ extern "C" CUresult cuDeviceGetPCIBusId ( char* pciBusId, int  len, CUdevice dev
   typedef CUresult (*cuDeviceGetPCIBusId_t)( char* pciBusId, int  len, CUdevice dev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetPCIBusId)(pciBusId, len, dev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2402,7 +2402,7 @@ extern "C" CUresult cuIpcCloseMemHandle ( CUdeviceptr dptr ) {
   typedef CUresult (*cuIpcCloseMemHandle_t)( CUdeviceptr dptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuIpcCloseMemHandle)(dptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2416,7 +2416,7 @@ extern "C" CUresult cuIpcGetEventHandle ( CUipcEventHandle* pHandle, CUevent eve
   typedef CUresult (*cuIpcGetEventHandle_t)( CUipcEventHandle* pHandle, CUevent event );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuIpcGetEventHandle)(pHandle, event);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2430,7 +2430,7 @@ extern "C" CUresult cuIpcGetMemHandle ( CUipcMemHandle* pHandle, CUdeviceptr dpt
   typedef CUresult (*cuIpcGetMemHandle_t)( CUipcMemHandle* pHandle, CUdeviceptr dptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuIpcGetMemHandle)(pHandle, dptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2444,7 +2444,7 @@ extern "C" CUresult cuIpcOpenEventHandle ( CUevent* phEvent, CUipcEventHandle ha
   typedef CUresult (*cuIpcOpenEventHandle_t)( CUevent* phEvent, CUipcEventHandle handle );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuIpcOpenEventHandle)(phEvent, handle);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2458,7 +2458,7 @@ extern "C" CUresult cuIpcOpenMemHandle_v2 ( CUdeviceptr* pdptr, CUipcMemHandle h
   typedef CUresult (*cuIpcOpenMemHandle_v2_t)( CUdeviceptr* pdptr, CUipcMemHandle handle, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuIpcOpenMemHandle_v2)(pdptr, handle, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2472,7 +2472,7 @@ extern "C" CUresult cuMemAlloc_v2 ( CUdeviceptr* dptr, size_t bytesize ) {
   typedef CUresult (*cuMemAlloc_v2_t)( CUdeviceptr* dptr, size_t bytesize );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemAlloc_v2)(dptr, bytesize);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2486,7 +2486,7 @@ extern "C" CUresult cuMemAllocHost_v2 ( void** pp, size_t bytesize ) {
   typedef CUresult (*cuMemAllocHost_v2_t)( void** pp, size_t bytesize );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemAllocHost_v2)(pp, bytesize);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2500,7 +2500,7 @@ extern "C" CUresult cuMemAllocManaged ( CUdeviceptr* dptr, size_t bytesize, unsi
   typedef CUresult (*cuMemAllocManaged_t)( CUdeviceptr* dptr, size_t bytesize, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemAllocManaged)(dptr, bytesize, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2514,7 +2514,7 @@ extern "C" CUresult cuMemAllocPitch_v2 ( CUdeviceptr* dptr, size_t* pPitch, size
   typedef CUresult (*cuMemAllocPitch_v2_t)( CUdeviceptr* dptr, size_t* pPitch, size_t WidthInBytes, size_t Height, unsigned int  ElementSizeBytes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemAllocPitch_v2)(dptr, pPitch, WidthInBytes, Height, ElementSizeBytes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2528,7 +2528,7 @@ extern "C" CUresult cuMemFree_v2 ( CUdeviceptr dptr ) {
   typedef CUresult (*cuMemFree_v2_t)( CUdeviceptr dptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemFree_v2)(dptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2542,7 +2542,7 @@ extern "C" CUresult cuMemFreeHost ( void* p ) {
   typedef CUresult (*cuMemFreeHost_t)( void* p );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemFreeHost)(p);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2556,7 +2556,7 @@ extern "C" CUresult cuMemGetAddressRange_v2 ( CUdeviceptr* pbase, size_t* psize,
   typedef CUresult (*cuMemGetAddressRange_v2_t)( CUdeviceptr* pbase, size_t* psize, CUdeviceptr dptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemGetAddressRange_v2)(pbase, psize, dptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2570,7 +2570,7 @@ extern "C" CUresult cuMemGetInfo_v2 ( size_t* free, size_t* total ) {
   typedef CUresult (*cuMemGetInfo_v2_t)( size_t* free, size_t* total );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemGetInfo_v2)(free, total);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2584,7 +2584,7 @@ extern "C" CUresult cuMemHostAlloc ( void** pp, size_t bytesize, unsigned int  F
   typedef CUresult (*cuMemHostAlloc_t)( void** pp, size_t bytesize, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemHostAlloc)(pp, bytesize, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2598,7 +2598,7 @@ extern "C" CUresult cuMemHostGetDevicePointer_v2 ( CUdeviceptr* pdptr, void* p, 
   typedef CUresult (*cuMemHostGetDevicePointer_v2_t)( CUdeviceptr* pdptr, void* p, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemHostGetDevicePointer_v2)(pdptr, p, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2612,7 +2612,7 @@ extern "C" CUresult cuMemHostGetFlags ( unsigned int* pFlags, void* p ) {
   typedef CUresult (*cuMemHostGetFlags_t)( unsigned int* pFlags, void* p );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemHostGetFlags)(pFlags, p);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2626,7 +2626,7 @@ extern "C" CUresult cuMemHostRegister_v2 ( void* p, size_t bytesize, unsigned in
   typedef CUresult (*cuMemHostRegister_v2_t)( void* p, size_t bytesize, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemHostRegister_v2)(p, bytesize, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2640,7 +2640,7 @@ extern "C" CUresult cuMemHostUnregister ( void* p ) {
   typedef CUresult (*cuMemHostUnregister_t)( void* p );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemHostUnregister)(p);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2654,7 +2654,7 @@ extern "C" CUresult cuMemcpy ( CUdeviceptr dst, CUdeviceptr src, size_t ByteCoun
   typedef CUresult (*cuMemcpy_t)( CUdeviceptr dst, CUdeviceptr src, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy)(dst, src, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2668,7 +2668,7 @@ extern "C" CUresult cuMemcpy2D_v2 ( const CUDA_MEMCPY2D* pCopy ) {
   typedef CUresult (*cuMemcpy2D_v2_t)( const CUDA_MEMCPY2D* pCopy );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy2D_v2)(pCopy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2682,7 +2682,7 @@ extern "C" CUresult cuMemcpy2DAsync_v2 ( const CUDA_MEMCPY2D* pCopy, CUstream hS
   typedef CUresult (*cuMemcpy2DAsync_v2_t)( const CUDA_MEMCPY2D* pCopy, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy2DAsync_v2)(pCopy, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2696,7 +2696,7 @@ extern "C" CUresult cuMemcpy2DUnaligned_v2 ( const CUDA_MEMCPY2D* pCopy ) {
   typedef CUresult (*cuMemcpy2DUnaligned_v2_t)( const CUDA_MEMCPY2D* pCopy );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy2DUnaligned_v2)(pCopy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2710,7 +2710,7 @@ extern "C" CUresult cuMemcpy3D_v2 ( const CUDA_MEMCPY3D* pCopy ) {
   typedef CUresult (*cuMemcpy3D_v2_t)( const CUDA_MEMCPY3D* pCopy );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy3D_v2)(pCopy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2724,7 +2724,7 @@ extern "C" CUresult cuMemcpy3DAsync_v2 ( const CUDA_MEMCPY3D* pCopy, CUstream hS
   typedef CUresult (*cuMemcpy3DAsync_v2_t)( const CUDA_MEMCPY3D* pCopy, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy3DAsync_v2)(pCopy, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2738,7 +2738,7 @@ extern "C" CUresult cuMemcpy3DPeer ( const CUDA_MEMCPY3D_PEER* pCopy ) {
   typedef CUresult (*cuMemcpy3DPeer_t)( const CUDA_MEMCPY3D_PEER* pCopy );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy3DPeer)(pCopy);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2752,7 +2752,7 @@ extern "C" CUresult cuMemcpy3DPeerAsync ( const CUDA_MEMCPY3D_PEER* pCopy, CUstr
   typedef CUresult (*cuMemcpy3DPeerAsync_t)( const CUDA_MEMCPY3D_PEER* pCopy, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpy3DPeerAsync)(pCopy, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2766,7 +2766,7 @@ extern "C" CUresult cuMemcpyAsync ( CUdeviceptr dst, CUdeviceptr src, size_t Byt
   typedef CUresult (*cuMemcpyAsync_t)( CUdeviceptr dst, CUdeviceptr src, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyAsync)(dst, src, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2780,7 +2780,7 @@ extern "C" CUresult cuMemcpyAtoA_v2 ( CUarray dstArray, size_t dstOffset, CUarra
   typedef CUresult (*cuMemcpyAtoA_v2_t)( CUarray dstArray, size_t dstOffset, CUarray srcArray, size_t srcOffset, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyAtoA_v2)(dstArray, dstOffset, srcArray, srcOffset, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2794,7 +2794,7 @@ extern "C" CUresult cuMemcpyAtoD_v2 ( CUdeviceptr dstDevice, CUarray srcArray, s
   typedef CUresult (*cuMemcpyAtoD_v2_t)( CUdeviceptr dstDevice, CUarray srcArray, size_t srcOffset, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyAtoD_v2)(dstDevice, srcArray, srcOffset, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2808,7 +2808,7 @@ extern "C" CUresult cuMemcpyAtoH_v2 ( void* dstHost, CUarray srcArray, size_t sr
   typedef CUresult (*cuMemcpyAtoH_v2_t)( void* dstHost, CUarray srcArray, size_t srcOffset, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyAtoH_v2)(dstHost, srcArray, srcOffset, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2822,7 +2822,7 @@ extern "C" CUresult cuMemcpyAtoHAsync_v2 ( void* dstHost, CUarray srcArray, size
   typedef CUresult (*cuMemcpyAtoHAsync_v2_t)( void* dstHost, CUarray srcArray, size_t srcOffset, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyAtoHAsync_v2)(dstHost, srcArray, srcOffset, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2836,7 +2836,7 @@ extern "C" CUresult cuMemcpyDtoA_v2 ( CUarray dstArray, size_t dstOffset, CUdevi
   typedef CUresult (*cuMemcpyDtoA_v2_t)( CUarray dstArray, size_t dstOffset, CUdeviceptr srcDevice, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyDtoA_v2)(dstArray, dstOffset, srcDevice, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2850,7 +2850,7 @@ extern "C" CUresult cuMemcpyDtoD_v2 ( CUdeviceptr dstDevice, CUdeviceptr srcDevi
   typedef CUresult (*cuMemcpyDtoD_v2_t)( CUdeviceptr dstDevice, CUdeviceptr srcDevice, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyDtoD_v2)(dstDevice, srcDevice, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2864,7 +2864,7 @@ extern "C" CUresult cuMemcpyDtoDAsync_v2 ( CUdeviceptr dstDevice, CUdeviceptr sr
   typedef CUresult (*cuMemcpyDtoDAsync_v2_t)( CUdeviceptr dstDevice, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyDtoDAsync_v2)(dstDevice, srcDevice, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2878,7 +2878,7 @@ extern "C" CUresult cuMemcpyDtoH_v2 ( void* dstHost, CUdeviceptr srcDevice, size
   typedef CUresult (*cuMemcpyDtoH_v2_t)( void* dstHost, CUdeviceptr srcDevice, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyDtoH_v2)(dstHost, srcDevice, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2892,7 +2892,7 @@ extern "C" CUresult cuMemcpyDtoHAsync_v2 ( void* dstHost, CUdeviceptr srcDevice,
   typedef CUresult (*cuMemcpyDtoHAsync_v2_t)( void* dstHost, CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyDtoHAsync_v2)(dstHost, srcDevice, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2906,7 +2906,7 @@ extern "C" CUresult cuMemcpyHtoA_v2 ( CUarray dstArray, size_t dstOffset, const 
   typedef CUresult (*cuMemcpyHtoA_v2_t)( CUarray dstArray, size_t dstOffset, const void* srcHost, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyHtoA_v2)(dstArray, dstOffset, srcHost, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2920,7 +2920,7 @@ extern "C" CUresult cuMemcpyHtoAAsync_v2 ( CUarray dstArray, size_t dstOffset, c
   typedef CUresult (*cuMemcpyHtoAAsync_v2_t)( CUarray dstArray, size_t dstOffset, const void* srcHost, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyHtoAAsync_v2)(dstArray, dstOffset, srcHost, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2934,7 +2934,7 @@ extern "C" CUresult cuMemcpyHtoD_v2 ( CUdeviceptr dstDevice, const void* srcHost
   typedef CUresult (*cuMemcpyHtoD_v2_t)( CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyHtoD_v2)(dstDevice, srcHost, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2948,7 +2948,7 @@ extern "C" CUresult cuMemcpyHtoDAsync_v2 ( CUdeviceptr dstDevice, const void* sr
   typedef CUresult (*cuMemcpyHtoDAsync_v2_t)( CUdeviceptr dstDevice, const void* srcHost, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyHtoDAsync_v2)(dstDevice, srcHost, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2962,7 +2962,7 @@ extern "C" CUresult cuMemcpyPeer ( CUdeviceptr dstDevice, CUcontext dstContext, 
   typedef CUresult (*cuMemcpyPeer_t)( CUdeviceptr dstDevice, CUcontext dstContext, CUdeviceptr srcDevice, CUcontext srcContext, size_t ByteCount );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyPeer)(dstDevice, dstContext, srcDevice, srcContext, ByteCount);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2976,7 +2976,7 @@ extern "C" CUresult cuMemcpyPeerAsync ( CUdeviceptr dstDevice, CUcontext dstCont
   typedef CUresult (*cuMemcpyPeerAsync_t)( CUdeviceptr dstDevice, CUcontext dstContext, CUdeviceptr srcDevice, CUcontext srcContext, size_t ByteCount, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemcpyPeerAsync)(dstDevice, dstContext, srcDevice, srcContext, ByteCount, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -2990,7 +2990,7 @@ extern "C" CUresult cuMemsetD16_v2 ( CUdeviceptr dstDevice, unsigned short us, s
   typedef CUresult (*cuMemsetD16_v2_t)( CUdeviceptr dstDevice, unsigned short us, size_t N );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD16_v2)(dstDevice, us, N);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3004,7 +3004,7 @@ extern "C" CUresult cuMemsetD16Async ( CUdeviceptr dstDevice, unsigned short us,
   typedef CUresult (*cuMemsetD16Async_t)( CUdeviceptr dstDevice, unsigned short us, size_t N, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD16Async)(dstDevice, us, N, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3018,7 +3018,7 @@ extern "C" CUresult cuMemsetD2D16_v2 ( CUdeviceptr dstDevice, size_t dstPitch, u
   typedef CUresult (*cuMemsetD2D16_v2_t)( CUdeviceptr dstDevice, size_t dstPitch, unsigned short us, size_t Width, size_t Height );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD2D16_v2)(dstDevice, dstPitch, us, Width, Height);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3032,7 +3032,7 @@ extern "C" CUresult cuMemsetD2D16Async ( CUdeviceptr dstDevice, size_t dstPitch,
   typedef CUresult (*cuMemsetD2D16Async_t)( CUdeviceptr dstDevice, size_t dstPitch, unsigned short us, size_t Width, size_t Height, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD2D16Async)(dstDevice, dstPitch, us, Width, Height, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3046,7 +3046,7 @@ extern "C" CUresult cuMemsetD2D32_v2 ( CUdeviceptr dstDevice, size_t dstPitch, u
   typedef CUresult (*cuMemsetD2D32_v2_t)( CUdeviceptr dstDevice, size_t dstPitch, unsigned int  ui, size_t Width, size_t Height );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD2D32_v2)(dstDevice, dstPitch, ui, Width, Height);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3060,7 +3060,7 @@ extern "C" CUresult cuMemsetD2D32Async ( CUdeviceptr dstDevice, size_t dstPitch,
   typedef CUresult (*cuMemsetD2D32Async_t)( CUdeviceptr dstDevice, size_t dstPitch, unsigned int  ui, size_t Width, size_t Height, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD2D32Async)(dstDevice, dstPitch, ui, Width, Height, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3074,7 +3074,7 @@ extern "C" CUresult cuMemsetD2D8_v2 ( CUdeviceptr dstDevice, size_t dstPitch, un
   typedef CUresult (*cuMemsetD2D8_v2_t)( CUdeviceptr dstDevice, size_t dstPitch, unsigned char  uc, size_t Width, size_t Height );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD2D8_v2)(dstDevice, dstPitch, uc, Width, Height);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3088,7 +3088,7 @@ extern "C" CUresult cuMemsetD2D8Async ( CUdeviceptr dstDevice, size_t dstPitch, 
   typedef CUresult (*cuMemsetD2D8Async_t)( CUdeviceptr dstDevice, size_t dstPitch, unsigned char  uc, size_t Width, size_t Height, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD2D8Async)(dstDevice, dstPitch, uc, Width, Height, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3102,7 +3102,7 @@ extern "C" CUresult cuMemsetD32_v2 ( CUdeviceptr dstDevice, unsigned int  ui, si
   typedef CUresult (*cuMemsetD32_v2_t)( CUdeviceptr dstDevice, unsigned int  ui, size_t N );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD32_v2)(dstDevice, ui, N);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3116,7 +3116,7 @@ extern "C" CUresult cuMemsetD32Async ( CUdeviceptr dstDevice, unsigned int  ui, 
   typedef CUresult (*cuMemsetD32Async_t)( CUdeviceptr dstDevice, unsigned int  ui, size_t N, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD32Async)(dstDevice, ui, N, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3130,7 +3130,7 @@ extern "C" CUresult cuMemsetD8_v2 ( CUdeviceptr dstDevice, unsigned char  uc, si
   typedef CUresult (*cuMemsetD8_v2_t)( CUdeviceptr dstDevice, unsigned char  uc, size_t N );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD8_v2)(dstDevice, uc, N);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3144,7 +3144,7 @@ extern "C" CUresult cuMemsetD8Async ( CUdeviceptr dstDevice, unsigned char  uc, 
   typedef CUresult (*cuMemsetD8Async_t)( CUdeviceptr dstDevice, unsigned char  uc, size_t N, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemsetD8Async)(dstDevice, uc, N, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3158,7 +3158,7 @@ extern "C" CUresult cuMipmappedArrayCreate ( CUmipmappedArray* pHandle, const CU
   typedef CUresult (*cuMipmappedArrayCreate_t)( CUmipmappedArray* pHandle, const CUDA_ARRAY3D_DESCRIPTOR* pMipmappedArrayDesc, unsigned int  numMipmapLevels );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMipmappedArrayCreate)(pHandle, pMipmappedArrayDesc, numMipmapLevels);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3174,7 +3174,7 @@ extern "C" CUresult cuMipmappedArrayDestroy ( CUmipmappedArray hMipmappedArray )
   typedef CUresult (*cuMipmappedArrayDestroy_t)( CUmipmappedArray hMipmappedArray );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMipmappedArrayDestroy)(hMipmappedArray);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3190,7 +3190,7 @@ extern "C" CUresult cuMipmappedArrayGetLevel ( CUarray* pLevelArray, CUmipmapped
   typedef CUresult (*cuMipmappedArrayGetLevel_t)( CUarray* pLevelArray, CUmipmappedArray hMipmappedArray, unsigned int  level );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMipmappedArrayGetLevel)(pLevelArray, hMipmappedArray, level);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3205,7 +3205,7 @@ extern "C" CUresult cuMemAdvise ( CUdeviceptr devPtr, size_t count, CUmem_advise
   typedef CUresult (*cuMemAdvise_t)( CUdeviceptr devPtr, size_t count, CUmem_advise advice, CUdevice device );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemAdvise)(devPtr, count, advice, device);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3219,7 +3219,7 @@ extern "C" CUresult cuMemPrefetchAsync ( CUdeviceptr devPtr, size_t count, CUdev
   typedef CUresult (*cuMemPrefetchAsync_t)( CUdeviceptr devPtr, size_t count, CUdevice dstDevice, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemPrefetchAsync)(devPtr, count, dstDevice, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3233,7 +3233,7 @@ extern "C" CUresult cuMemRangeGetAttribute ( void* data, size_t dataSize, CUmem_
   typedef CUresult (*cuMemRangeGetAttribute_t)( void* data, size_t dataSize, CUmem_range_attribute attribute, CUdeviceptr devPtr, size_t count );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemRangeGetAttribute)(data, dataSize, attribute, devPtr, count);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3247,7 +3247,7 @@ extern "C" CUresult cuMemRangeGetAttributes ( void** data, size_t* dataSizes, CU
   typedef CUresult (*cuMemRangeGetAttributes_t)( void** data, size_t* dataSizes, CUmem_range_attribute* attributes, size_t numAttributes, CUdeviceptr devPtr, size_t count );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuMemRangeGetAttributes)(data, dataSizes, attributes, numAttributes, devPtr, count);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3261,7 +3261,7 @@ extern "C" CUresult cuPointerGetAttribute ( void* data, CUpointer_attribute attr
   typedef CUresult (*cuPointerGetAttribute_t)( void* data, CUpointer_attribute attribute, CUdeviceptr ptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuPointerGetAttribute)(data, attribute, ptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3275,7 +3275,7 @@ extern "C" CUresult cuPointerGetAttributes ( unsigned int  numAttributes, CUpoin
   typedef CUresult (*cuPointerGetAttributes_t)( unsigned int  numAttributes, CUpointer_attribute* attributes, void** data, CUdeviceptr ptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuPointerGetAttributes)(numAttributes, attributes, data, ptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3289,7 +3289,7 @@ extern "C" CUresult cuPointerSetAttribute ( const void* value, CUpointer_attribu
   typedef CUresult (*cuPointerSetAttribute_t)( const void* value, CUpointer_attribute attribute, CUdeviceptr ptr );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuPointerSetAttribute)(value, attribute, ptr);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3304,7 +3304,7 @@ extern "C" CUresult cuStreamAddCallback ( CUstream hStream, CUstreamCallback cal
   typedef CUresult (*cuStreamAddCallback_t)( CUstream hStream, CUstreamCallback callback, void* userData, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamAddCallback)(hStream, callback, userData, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3318,7 +3318,7 @@ extern "C" CUresult cuStreamAttachMemAsync ( CUstream hStream, CUdeviceptr dptr,
   typedef CUresult (*cuStreamAttachMemAsync_t)( CUstream hStream, CUdeviceptr dptr, size_t length, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamAttachMemAsync)(hStream, dptr, length, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3332,7 +3332,7 @@ extern "C" CUresult cuStreamBeginCapture_v2 ( CUstream hStream , CUstreamCapture
   typedef CUresult (*cuStreamBeginCapture_v2_t)( CUstream hStream , CUstreamCaptureMode mode );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamBeginCapture_v2)(hStream, mode);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3346,7 +3346,7 @@ extern "C" CUresult cuStreamCreate ( CUstream* phStream, unsigned int  Flags ) {
   typedef CUresult (*cuStreamCreate_t)( CUstream* phStream, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamCreate)(phStream, Flags);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3362,7 +3362,7 @@ extern "C" CUresult cuStreamCreateWithPriority ( CUstream* phStream, unsigned in
   typedef CUresult (*cuStreamCreateWithPriority_t)( CUstream* phStream, unsigned int  flags, int  priority );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamCreateWithPriority)(phStream, flags, priority);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3378,7 +3378,7 @@ extern "C" CUresult cuStreamDestroy_v2 ( CUstream hStream ) {
   typedef CUresult (*cuStreamDestroy_v2_t)( CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamDestroy_v2)(hStream);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3394,7 +3394,7 @@ extern "C" CUresult cuStreamEndCapture ( CUstream hStream, CUgraph* phGraph ) {
   typedef CUresult (*cuStreamEndCapture_t)( CUstream hStream, CUgraph* phGraph );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamEndCapture)(hStream, phGraph);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3410,7 +3410,7 @@ extern "C" CUresult cuStreamGetCtx ( CUstream hStream, CUcontext* pctx ) {
   typedef CUresult (*cuStreamGetCtx_t)( CUstream hStream, CUcontext* pctx );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamGetCtx)(hStream, pctx);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3424,7 +3424,7 @@ extern "C" CUresult cuStreamGetFlags ( CUstream hStream, unsigned int* flags ) {
   typedef CUresult (*cuStreamGetFlags_t)( CUstream hStream, unsigned int* flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamGetFlags)(hStream, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3438,7 +3438,7 @@ extern "C" CUresult cuStreamGetPriority ( CUstream hStream, int* priority ) {
   typedef CUresult (*cuStreamGetPriority_t)( CUstream hStream, int* priority );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamGetPriority)(hStream, priority);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3452,7 +3452,7 @@ extern "C" CUresult cuStreamIsCapturing ( CUstream hStream, CUstreamCaptureStatu
   typedef CUresult (*cuStreamIsCapturing_t)( CUstream hStream, CUstreamCaptureStatus* captureStatus );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamIsCapturing)(hStream, captureStatus);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3466,7 +3466,7 @@ extern "C" CUresult cuStreamQuery ( CUstream hStream ) {
   typedef CUresult (*cuStreamQuery_t)( CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamQuery)(hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3480,7 +3480,7 @@ extern "C" CUresult cuStreamSynchronize ( CUstream hStream ) {
   typedef CUresult (*cuStreamSynchronize_t)( CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamSynchronize)(hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3494,7 +3494,7 @@ extern "C" CUresult cuStreamWaitEvent ( CUstream hStream, CUevent hEvent, unsign
   typedef CUresult (*cuStreamWaitEvent_t)( CUstream hStream, CUevent hEvent, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamWaitEvent)(hStream, hEvent, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3511,7 +3511,7 @@ extern "C" CUresult cuEventCreate ( CUevent* phEvent, unsigned int  Flags ) {
   typedef CUresult (*cuEventCreate_t)( CUevent* phEvent, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventCreate)(phEvent, Flags);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3527,7 +3527,7 @@ extern "C" CUresult cuEventDestroy_v2 ( CUevent hEvent ) {
   typedef CUresult (*cuEventDestroy_v2_t)( CUevent hEvent );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventDestroy_v2)(hEvent);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3543,7 +3543,7 @@ extern "C" CUresult cuEventElapsedTime ( float* pMilliseconds, CUevent hStart, C
   typedef CUresult (*cuEventElapsedTime_t)( float* pMilliseconds, CUevent hStart, CUevent hEnd );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventElapsedTime)(pMilliseconds, hStart, hEnd);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3557,7 +3557,7 @@ extern "C" CUresult cuEventQuery ( CUevent hEvent ) {
   typedef CUresult (*cuEventQuery_t)( CUevent hEvent );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventQuery)(hEvent);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3571,7 +3571,7 @@ extern "C" CUresult cuEventRecord ( CUevent hEvent, CUstream hStream ) {
   typedef CUresult (*cuEventRecord_t)( CUevent hEvent, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventRecord)(hEvent, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3585,7 +3585,7 @@ extern "C" CUresult  cuEventRecordWithFlags ( CUevent hEvent, CUstream hStream, 
   typedef CUresult (*cuEventRecordWithFlags_t)( CUevent hEvent, CUstream hStream, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventRecordWithFlags)(hEvent, hStream, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3599,7 +3599,7 @@ extern "C" CUresult cuEventSynchronize ( CUevent hEvent ) {
   typedef CUresult (*cuEventSynchronize_t)( CUevent hEvent );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuEventSynchronize)(hEvent);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3614,7 +3614,7 @@ extern "C" CUresult cuDestroyExternalMemory ( CUexternalMemory extMem ) {
   typedef CUresult (*cuDestroyExternalMemory_t)( CUexternalMemory extMem );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDestroyExternalMemory)(extMem);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3630,7 +3630,7 @@ extern "C" CUresult cuDestroyExternalSemaphore ( CUexternalSemaphore extSem ) {
   typedef CUresult (*cuDestroyExternalSemaphore_t)( CUexternalSemaphore extSem );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDestroyExternalSemaphore)(extSem);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -3646,7 +3646,7 @@ extern "C" CUresult cuExternalMemoryGetMappedBuffer ( CUdeviceptr* devPtr, CUext
   typedef CUresult (*cuExternalMemoryGetMappedBuffer_t)( CUdeviceptr* devPtr, CUexternalMemory extMem, const CUDA_EXTERNAL_MEMORY_BUFFER_DESC* bufferDesc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuExternalMemoryGetMappedBuffer)(devPtr, extMem, bufferDesc);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3660,7 +3660,7 @@ extern "C" CUresult cuExternalMemoryGetMappedMipmappedArray ( CUmipmappedArray* 
   typedef CUresult (*cuExternalMemoryGetMappedMipmappedArray_t)( CUmipmappedArray* mipmap, CUexternalMemory extMem, const CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC* mipmapDesc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuExternalMemoryGetMappedMipmappedArray)(mipmap, extMem, mipmapDesc);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3674,7 +3674,7 @@ extern "C" CUresult cuImportExternalMemory ( CUexternalMemory* extMem_out, const
   typedef CUresult (*cuImportExternalMemory_t)( CUexternalMemory* extMem_out, const CUDA_EXTERNAL_MEMORY_HANDLE_DESC* memHandleDesc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuImportExternalMemory)(extMem_out, memHandleDesc);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3688,7 +3688,7 @@ extern "C" CUresult cuImportExternalSemaphore ( CUexternalSemaphore* extSem_out,
   typedef CUresult (*cuImportExternalSemaphore_t)( CUexternalSemaphore* extSem_out, const CUDA_EXTERNAL_SEMAPHORE_HANDLE_DESC* semHandleDesc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuImportExternalSemaphore)(extSem_out, semHandleDesc);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3702,7 +3702,7 @@ extern "C" CUresult cuSignalExternalSemaphoresAsync ( const CUexternalSemaphore*
   typedef CUresult (*cuSignalExternalSemaphoresAsync_t)( const CUexternalSemaphore* extSemArray, const CUDA_EXTERNAL_SEMAPHORE_SIGNAL_PARAMS* paramsArray, unsigned int  numExtSems, CUstream stream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuSignalExternalSemaphoresAsync)(extSemArray, paramsArray, numExtSems, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3716,7 +3716,7 @@ extern "C" CUresult cuWaitExternalSemaphoresAsync ( const CUexternalSemaphore* e
   typedef CUresult (*cuWaitExternalSemaphoresAsync_t)( const CUexternalSemaphore* extSemArray, const CUDA_EXTERNAL_SEMAPHORE_WAIT_PARAMS* paramsArray, unsigned int  numExtSems, CUstream stream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuWaitExternalSemaphoresAsync)(extSemArray, paramsArray, numExtSems, stream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3731,7 +3731,7 @@ extern "C" CUresult cuStreamBatchMemOp_v2 ( CUstream stream, unsigned int  count
   typedef CUresult (*cuStreamBatchMemOp_v2_t)( CUstream stream, unsigned int  count, CUstreamBatchMemOpParams* paramArray, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamBatchMemOp_v2)(stream, count, paramArray, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3745,7 +3745,7 @@ extern "C" CUresult cuStreamWaitValue32_v2 ( CUstream stream, CUdeviceptr addr, 
   typedef CUresult (*cuStreamWaitValue32_v2_t)( CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamWaitValue32_v2)(stream, addr, value, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3759,7 +3759,7 @@ extern "C" CUresult cuStreamWaitValue64_v2 ( CUstream stream, CUdeviceptr addr, 
   typedef CUresult (*cuStreamWaitValue64_v2_t)( CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamWaitValue64_v2)(stream, addr, value, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3773,7 +3773,7 @@ extern "C" CUresult cuStreamWriteValue32_v2 ( CUstream stream, CUdeviceptr addr,
   typedef CUresult (*cuStreamWriteValue32_v2_t)( CUstream stream, CUdeviceptr addr, cuuint32_t value, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamWriteValue32_v2)(stream, addr, value, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3787,7 +3787,7 @@ extern "C" CUresult cuStreamWriteValue64_v2 ( CUstream stream, CUdeviceptr addr,
   typedef CUresult (*cuStreamWriteValue64_v2_t)( CUstream stream, CUdeviceptr addr, cuuint64_t value, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuStreamWriteValue64_v2)(stream, addr, value, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3802,7 +3802,7 @@ extern "C" CUresult cuFuncGetAttribute ( int* pi, CUfunction_attribute attrib, C
   typedef CUresult (*cuFuncGetAttribute_t)( int* pi, CUfunction_attribute attrib, CUfunction hfunc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuFuncGetAttribute)(pi, attrib, hfunc);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3816,7 +3816,7 @@ extern "C" CUresult cuFuncSetAttribute ( CUfunction hfunc, CUfunction_attribute 
   typedef CUresult (*cuFuncSetAttribute_t)( CUfunction hfunc, CUfunction_attribute attrib, int  value );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuFuncSetAttribute)(hfunc, attrib, value);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3830,7 +3830,7 @@ extern "C" CUresult cuFuncSetCacheConfig ( CUfunction hfunc, CUfunc_cache config
   typedef CUresult (*cuFuncSetCacheConfig_t)( CUfunction hfunc, CUfunc_cache config );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuFuncSetCacheConfig)(hfunc, config);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3844,7 +3844,7 @@ extern "C" CUresult cuFuncSetSharedMemConfig ( CUfunction hfunc, CUsharedconfig 
   typedef CUresult (*cuFuncSetSharedMemConfig_t)( CUfunction hfunc, CUsharedconfig config );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuFuncSetSharedMemConfig)(hfunc, config);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3858,7 +3858,7 @@ extern "C" CUresult cuLaunchCooperativeKernel ( CUfunction f, unsigned int  grid
   typedef CUresult (*cuLaunchCooperativeKernel_t)( CUfunction f, unsigned int  gridDimX, unsigned int  gridDimY, unsigned int  gridDimZ, unsigned int  blockDimX, unsigned int  blockDimY, unsigned int  blockDimZ, unsigned int  sharedMemBytes, CUstream hStream, void** kernelParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunchCooperativeKernel)(f, gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ, sharedMemBytes, hStream, kernelParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3872,7 +3872,7 @@ extern "C" CUresult cuLaunchCooperativeKernelMultiDevice ( CUDA_LAUNCH_PARAMS* l
   typedef CUresult (*cuLaunchCooperativeKernelMultiDevice_t)( CUDA_LAUNCH_PARAMS* launchParamsList, unsigned int  numDevices, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunchCooperativeKernelMultiDevice)(launchParamsList, numDevices, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3886,7 +3886,7 @@ extern "C" CUresult cuLaunchHostFunc ( CUstream hStream, CUhostFn fn, void* user
   typedef CUresult (*cuLaunchHostFunc_t)( CUstream hStream, CUhostFn fn, void* userData );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunchHostFunc)(hStream, fn, userData);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3900,7 +3900,7 @@ extern "C" CUresult cuLaunchKernel ( CUfunction f, unsigned int  gridDimX, unsig
   typedef CUresult (*cuLaunchKernel_t)( CUfunction f, unsigned int  gridDimX, unsigned int  gridDimY, unsigned int  gridDimZ, unsigned int  blockDimX, unsigned int  blockDimY, unsigned int  blockDimZ, unsigned int  sharedMemBytes, CUstream hStream, void** kernelParams, void** extra );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunchKernel)(f, gridDimX, gridDimY, gridDimZ, blockDimX, blockDimY, blockDimZ, sharedMemBytes, hStream, kernelParams, extra);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3915,7 +3915,7 @@ extern "C" CUresult cuFuncSetBlockShape ( CUfunction hfunc, int  x, int  y, int 
   typedef CUresult (*cuFuncSetBlockShape_t)( CUfunction hfunc, int  x, int  y, int  z );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuFuncSetBlockShape)(hfunc, x, y, z);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3929,7 +3929,7 @@ extern "C" CUresult cuFuncSetSharedSize ( CUfunction hfunc, unsigned int  bytes 
   typedef CUresult (*cuFuncSetSharedSize_t)( CUfunction hfunc, unsigned int  bytes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuFuncSetSharedSize)(hfunc, bytes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3943,7 +3943,7 @@ extern "C" CUresult cuLaunch ( CUfunction f ) {
   typedef CUresult (*cuLaunch_t)( CUfunction f );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunch)(f);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3957,7 +3957,7 @@ extern "C" CUresult cuLaunchGrid ( CUfunction f, int  grid_width, int  grid_heig
   typedef CUresult (*cuLaunchGrid_t)( CUfunction f, int  grid_width, int  grid_height );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunchGrid)(f, grid_width, grid_height);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3971,7 +3971,7 @@ extern "C" CUresult cuLaunchGridAsync ( CUfunction f, int  grid_width, int  grid
   typedef CUresult (*cuLaunchGridAsync_t)( CUfunction f, int  grid_width, int  grid_height, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuLaunchGridAsync)(f, grid_width, grid_height, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3985,7 +3985,7 @@ extern "C" CUresult cuParamSetSize ( CUfunction hfunc, unsigned int  numbytes ) 
   typedef CUresult (*cuParamSetSize_t)( CUfunction hfunc, unsigned int  numbytes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuParamSetSize)(hfunc, numbytes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -3999,7 +3999,7 @@ extern "C" CUresult cuParamSetTexRef ( CUfunction hfunc, int  texunit, CUtexref 
   typedef CUresult (*cuParamSetTexRef_t)( CUfunction hfunc, int  texunit, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuParamSetTexRef)(hfunc, texunit, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4013,7 +4013,7 @@ extern "C" CUresult cuParamSetf ( CUfunction hfunc, int  offset, float  value ) 
   typedef CUresult (*cuParamSetf_t)( CUfunction hfunc, int  offset, float  value );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuParamSetf)(hfunc, offset, value);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4027,7 +4027,7 @@ extern "C" CUresult cuParamSeti ( CUfunction hfunc, int  offset, unsigned int  v
   typedef CUresult (*cuParamSeti_t)( CUfunction hfunc, int  offset, unsigned int  value );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuParamSeti)(hfunc, offset, value);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4041,7 +4041,7 @@ extern "C" CUresult cuParamSetv ( CUfunction hfunc, int  offset, void* ptr, unsi
   typedef CUresult (*cuParamSetv_t)( CUfunction hfunc, int  offset, void* ptr, unsigned int  numbytes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuParamSetv)(hfunc, offset, ptr, numbytes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4074,7 +4074,7 @@ extern "C" CUresult cuGraphCreate ( CUgraph* phGraph, unsigned int  flags ) {
   typedef CUresult (*cuGraphCreate_t)( CUgraph* phGraph, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphCreate)(phGraph, flags);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4090,7 +4090,7 @@ extern "C" CUresult cuGraphDestroy ( CUgraph hGraph ) {
   typedef CUresult (*cuGraphDestroy_t)( CUgraph hGraph );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphDestroy)(hGraph);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4106,7 +4106,7 @@ extern "C" CUresult cuGraphDestroyNode ( CUgraphNode hNode ) {
   typedef CUresult (*cuGraphDestroyNode_t)( CUgraphNode hNode );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphDestroyNode)(hNode);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4122,7 +4122,7 @@ extern "C" CUresult cuGraphExecDestroy ( CUgraphExec hGraphExec ) {
   typedef CUresult (*cuGraphExecDestroy_t)( CUgraphExec hGraphExec );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphExecDestroy)(hGraphExec);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4138,7 +4138,7 @@ extern "C" CUresult cuGraphGetEdges ( CUgraph hGraph, CUgraphNode* from, CUgraph
   typedef CUresult (*cuGraphGetEdges_t)( CUgraph hGraph, CUgraphNode* from, CUgraphNode* to, size_t* numEdges );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphGetEdges)(hGraph, from, to, numEdges);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4152,7 +4152,7 @@ extern "C" CUresult cuGraphGetNodes ( CUgraph hGraph, CUgraphNode* nodes, size_t
   typedef CUresult (*cuGraphGetNodes_t)( CUgraph hGraph, CUgraphNode* nodes, size_t* numNodes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphGetNodes)(hGraph, nodes, numNodes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4166,7 +4166,7 @@ extern "C" CUresult cuGraphGetRootNodes ( CUgraph hGraph, CUgraphNode* rootNodes
   typedef CUresult (*cuGraphGetRootNodes_t)( CUgraph hGraph, CUgraphNode* rootNodes, size_t* numRootNodes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphGetRootNodes)(hGraph, rootNodes, numRootNodes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4180,7 +4180,7 @@ extern "C" CUresult cuGraphHostNodeGetParams ( CUgraphNode hNode, CUDA_HOST_NODE
   typedef CUresult (*cuGraphHostNodeGetParams_t)( CUgraphNode hNode, CUDA_HOST_NODE_PARAMS* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphHostNodeGetParams)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4194,7 +4194,7 @@ extern "C" CUresult cuGraphHostNodeSetParams ( CUgraphNode hNode, const CUDA_HOS
   typedef CUresult (*cuGraphHostNodeSetParams_t)( CUgraphNode hNode, const CUDA_HOST_NODE_PARAMS* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphHostNodeSetParams)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4208,7 +4208,7 @@ extern "C" CUresult cuGraphKernelNodeGetParams_v2 ( CUgraphNode hNode, CUDA_KERN
   typedef CUresult (*cuGraphKernelNodeGetParams_v2_t)( CUgraphNode hNode, CUDA_KERNEL_NODE_PARAMS* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphKernelNodeGetParams_v2)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4222,7 +4222,7 @@ extern "C" CUresult cuGraphKernelNodeSetParams_v2 ( CUgraphNode hNode, const CUD
   typedef CUresult (*cuGraphKernelNodeSetParams_v2_t)( CUgraphNode hNode, const CUDA_KERNEL_NODE_PARAMS* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphKernelNodeSetParams_v2)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4236,7 +4236,7 @@ extern "C" CUresult cuGraphLaunch ( CUgraphExec hGraphExec, CUstream hStream ) {
   typedef CUresult (*cuGraphLaunch_t)( CUgraphExec hGraphExec, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphLaunch)(hGraphExec, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4250,7 +4250,7 @@ extern "C" CUresult cuGraphMemcpyNodeGetParams ( CUgraphNode hNode, CUDA_MEMCPY3
   typedef CUresult (*cuGraphMemcpyNodeGetParams_t)( CUgraphNode hNode, CUDA_MEMCPY3D* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphMemcpyNodeGetParams)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4264,7 +4264,7 @@ extern "C" CUresult cuGraphMemcpyNodeSetParams ( CUgraphNode hNode, const CUDA_M
   typedef CUresult (*cuGraphMemcpyNodeSetParams_t)( CUgraphNode hNode, const CUDA_MEMCPY3D* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphMemcpyNodeSetParams)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4278,7 +4278,7 @@ extern "C" CUresult cuGraphMemsetNodeGetParams ( CUgraphNode hNode, CUDA_MEMSET_
   typedef CUresult (*cuGraphMemsetNodeGetParams_t)( CUgraphNode hNode, CUDA_MEMSET_NODE_PARAMS* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphMemsetNodeGetParams)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4292,7 +4292,7 @@ extern "C" CUresult cuGraphMemsetNodeSetParams ( CUgraphNode hNode, const CUDA_M
   typedef CUresult (*cuGraphMemsetNodeSetParams_t)( CUgraphNode hNode, const CUDA_MEMSET_NODE_PARAMS* nodeParams );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphMemsetNodeSetParams)(hNode, nodeParams);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4306,7 +4306,7 @@ extern "C" CUresult cuGraphNodeFindInClone ( CUgraphNode* phNode, CUgraphNode hO
   typedef CUresult (*cuGraphNodeFindInClone_t)( CUgraphNode* phNode, CUgraphNode hOriginalNode, CUgraph hClonedGraph );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphNodeFindInClone)(phNode, hOriginalNode, hClonedGraph);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4320,7 +4320,7 @@ extern "C" CUresult cuGraphNodeGetDependencies ( CUgraphNode hNode, CUgraphNode*
   typedef CUresult (*cuGraphNodeGetDependencies_t)( CUgraphNode hNode, CUgraphNode* dependencies, size_t* numDependencies );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphNodeGetDependencies)(hNode, dependencies, numDependencies);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4334,7 +4334,7 @@ extern "C" CUresult cuGraphNodeGetDependentNodes ( CUgraphNode hNode, CUgraphNod
   typedef CUresult (*cuGraphNodeGetDependentNodes_t)( CUgraphNode hNode, CUgraphNode* dependentNodes, size_t* numDependentNodes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphNodeGetDependentNodes)(hNode, dependentNodes, numDependentNodes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4348,7 +4348,7 @@ extern "C" CUresult cuGraphNodeGetType ( CUgraphNode hNode, CUgraphNodeType* typ
   typedef CUresult (*cuGraphNodeGetType_t)( CUgraphNode hNode, CUgraphNodeType* type );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphNodeGetType)(hNode, type);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4365,7 +4365,7 @@ extern "C" CUresult cuOccupancyMaxActiveBlocksPerMultiprocessor ( int* numBlocks
   typedef CUresult (*cuOccupancyMaxActiveBlocksPerMultiprocessor_t)( int* numBlocks, CUfunction func, int  blockSize, size_t dynamicSMemSize );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuOccupancyMaxActiveBlocksPerMultiprocessor)(numBlocks, func, blockSize, dynamicSMemSize);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4379,7 +4379,7 @@ extern "C" CUresult cuOccupancyMaxActiveBlocksPerMultiprocessorWithFlags ( int* 
   typedef CUresult (*cuOccupancyMaxActiveBlocksPerMultiprocessorWithFlags_t)( int* numBlocks, CUfunction func, int  blockSize, size_t dynamicSMemSize, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuOccupancyMaxActiveBlocksPerMultiprocessorWithFlags)(numBlocks, func, blockSize, dynamicSMemSize, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4393,7 +4393,7 @@ extern "C" CUresult cuOccupancyMaxPotentialBlockSize ( int* minGridSize, int* bl
   typedef CUresult (*cuOccupancyMaxPotentialBlockSize_t)( int* minGridSize, int* blockSize, CUfunction func, CUoccupancyB2DSize blockSizeToDynamicSMemSize, size_t dynamicSMemSize, int  blockSizeLimit );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuOccupancyMaxPotentialBlockSize)(minGridSize, blockSize, func, blockSizeToDynamicSMemSize, dynamicSMemSize, blockSizeLimit);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4407,7 +4407,7 @@ extern "C" CUresult cuOccupancyMaxPotentialBlockSizeWithFlags ( int* minGridSize
   typedef CUresult (*cuOccupancyMaxPotentialBlockSizeWithFlags_t)( int* minGridSize, int* blockSize, CUfunction func, CUoccupancyB2DSize blockSizeToDynamicSMemSize, size_t dynamicSMemSize, int  blockSizeLimit, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuOccupancyMaxPotentialBlockSizeWithFlags)(minGridSize, blockSize, func, blockSizeToDynamicSMemSize, dynamicSMemSize, blockSizeLimit, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4422,7 +4422,7 @@ extern "C" CUresult cuTexRefCreate ( CUtexref* pTexRef ) {
   typedef CUresult (*cuTexRefCreate_t)( CUtexref* pTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefCreate)(pTexRef);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4438,7 +4438,7 @@ extern "C" CUresult cuTexRefDestroy ( CUtexref hTexRef ) {
   typedef CUresult (*cuTexRefDestroy_t)( CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefDestroy)(hTexRef);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4454,7 +4454,7 @@ extern "C" CUresult cuTexRefGetAddress_v2 ( CUdeviceptr* pdptr, CUtexref hTexRef
   typedef CUresult (*cuTexRefGetAddress_v2_t)( CUdeviceptr* pdptr, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetAddress_v2)(pdptr, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4468,7 +4468,7 @@ extern "C" CUresult cuTexRefGetAddressMode ( CUaddress_mode* pam, CUtexref hTexR
   typedef CUresult (*cuTexRefGetAddressMode_t)( CUaddress_mode* pam, CUtexref hTexRef, int  dim );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetAddressMode)(pam, hTexRef, dim);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4482,7 +4482,7 @@ extern "C" CUresult cuTexRefGetArray ( CUarray* phArray, CUtexref hTexRef ) {
   typedef CUresult (*cuTexRefGetArray_t)( CUarray* phArray, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetArray)(phArray, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4496,7 +4496,7 @@ extern "C" CUresult cuTexRefGetBorderColor ( float* pBorderColor, CUtexref hTexR
   typedef CUresult (*cuTexRefGetBorderColor_t)( float* pBorderColor, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetBorderColor)(pBorderColor, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4510,7 +4510,7 @@ extern "C" CUresult cuTexRefGetFilterMode ( CUfilter_mode* pfm, CUtexref hTexRef
   typedef CUresult (*cuTexRefGetFilterMode_t)( CUfilter_mode* pfm, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetFilterMode)(pfm, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4524,7 +4524,7 @@ extern "C" CUresult cuTexRefGetFlags ( unsigned int* pFlags, CUtexref hTexRef ) 
   typedef CUresult (*cuTexRefGetFlags_t)( unsigned int* pFlags, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetFlags)(pFlags, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4538,7 +4538,7 @@ extern "C" CUresult cuTexRefGetFormat ( CUarray_format* pFormat, int* pNumChanne
   typedef CUresult (*cuTexRefGetFormat_t)( CUarray_format* pFormat, int* pNumChannels, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetFormat)(pFormat, pNumChannels, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4552,7 +4552,7 @@ extern "C" CUresult cuTexRefGetMaxAnisotropy ( int* pmaxAniso, CUtexref hTexRef 
   typedef CUresult (*cuTexRefGetMaxAnisotropy_t)( int* pmaxAniso, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetMaxAnisotropy)(pmaxAniso, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4566,7 +4566,7 @@ extern "C" CUresult cuTexRefGetMipmapFilterMode ( CUfilter_mode* pfm, CUtexref h
   typedef CUresult (*cuTexRefGetMipmapFilterMode_t)( CUfilter_mode* pfm, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetMipmapFilterMode)(pfm, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4580,7 +4580,7 @@ extern "C" CUresult cuTexRefGetMipmapLevelBias ( float* pbias, CUtexref hTexRef 
   typedef CUresult (*cuTexRefGetMipmapLevelBias_t)( float* pbias, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetMipmapLevelBias)(pbias, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4594,7 +4594,7 @@ extern "C" CUresult cuTexRefGetMipmapLevelClamp ( float* pminMipmapLevelClamp, f
   typedef CUresult (*cuTexRefGetMipmapLevelClamp_t)( float* pminMipmapLevelClamp, float* pmaxMipmapLevelClamp, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetMipmapLevelClamp)(pminMipmapLevelClamp, pmaxMipmapLevelClamp, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4608,7 +4608,7 @@ extern "C" CUresult cuTexRefGetMipmappedArray ( CUmipmappedArray* phMipmappedArr
   typedef CUresult (*cuTexRefGetMipmappedArray_t)( CUmipmappedArray* phMipmappedArray, CUtexref hTexRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefGetMipmappedArray)(phMipmappedArray, hTexRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4622,7 +4622,7 @@ extern "C" CUresult cuTexRefSetAddress_v2 ( size_t* ByteOffset, CUtexref hTexRef
   typedef CUresult (*cuTexRefSetAddress_v2_t)( size_t* ByteOffset, CUtexref hTexRef, CUdeviceptr dptr, size_t bytes );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetAddress_v2)(ByteOffset, hTexRef, dptr, bytes);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4636,7 +4636,7 @@ extern "C" CUresult cuTexRefSetAddress2D_v3 ( CUtexref hTexRef, const CUDA_ARRAY
   typedef CUresult (*cuTexRefSetAddress2D_v3_t)( CUtexref hTexRef, const CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, size_t Pitch );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetAddress2D_v3)(hTexRef, desc, dptr, Pitch);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4650,7 +4650,7 @@ extern "C" CUresult cuTexRefSetAddressMode ( CUtexref hTexRef, int  dim, CUaddre
   typedef CUresult (*cuTexRefSetAddressMode_t)( CUtexref hTexRef, int  dim, CUaddress_mode am );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetAddressMode)(hTexRef, dim, am);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4664,7 +4664,7 @@ extern "C" CUresult cuTexRefSetArray ( CUtexref hTexRef, CUarray hArray, unsigne
   typedef CUresult (*cuTexRefSetArray_t)( CUtexref hTexRef, CUarray hArray, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetArray)(hTexRef, hArray, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4678,7 +4678,7 @@ extern "C" CUresult cuTexRefSetBorderColor ( CUtexref hTexRef, float* pBorderCol
   typedef CUresult (*cuTexRefSetBorderColor_t)( CUtexref hTexRef, float* pBorderColor );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetBorderColor)(hTexRef, pBorderColor);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4692,7 +4692,7 @@ extern "C" CUresult cuTexRefSetFilterMode ( CUtexref hTexRef, CUfilter_mode fm )
   typedef CUresult (*cuTexRefSetFilterMode_t)( CUtexref hTexRef, CUfilter_mode fm );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetFilterMode)(hTexRef, fm);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4706,7 +4706,7 @@ extern "C" CUresult cuTexRefSetFlags ( CUtexref hTexRef, unsigned int  Flags ) {
   typedef CUresult (*cuTexRefSetFlags_t)( CUtexref hTexRef, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetFlags)(hTexRef, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4720,7 +4720,7 @@ extern "C" CUresult cuTexRefSetFormat ( CUtexref hTexRef, CUarray_format fmt, in
   typedef CUresult (*cuTexRefSetFormat_t)( CUtexref hTexRef, CUarray_format fmt, int  NumPackedComponents );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetFormat)(hTexRef, fmt, NumPackedComponents);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4734,7 +4734,7 @@ extern "C" CUresult cuTexRefSetMaxAnisotropy ( CUtexref hTexRef, unsigned int  m
   typedef CUresult (*cuTexRefSetMaxAnisotropy_t)( CUtexref hTexRef, unsigned int  maxAniso );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetMaxAnisotropy)(hTexRef, maxAniso);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4748,7 +4748,7 @@ extern "C" CUresult cuTexRefSetMipmapFilterMode ( CUtexref hTexRef, CUfilter_mod
   typedef CUresult (*cuTexRefSetMipmapFilterMode_t)( CUtexref hTexRef, CUfilter_mode fm );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetMipmapFilterMode)(hTexRef, fm);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4762,7 +4762,7 @@ extern "C" CUresult cuTexRefSetMipmapLevelBias ( CUtexref hTexRef, float  bias )
   typedef CUresult (*cuTexRefSetMipmapLevelBias_t)( CUtexref hTexRef, float  bias );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetMipmapLevelBias)(hTexRef, bias);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4776,7 +4776,7 @@ extern "C" CUresult cuTexRefSetMipmapLevelClamp ( CUtexref hTexRef, float  minMi
   typedef CUresult (*cuTexRefSetMipmapLevelClamp_t)( CUtexref hTexRef, float  minMipmapLevelClamp, float  maxMipmapLevelClamp );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetMipmapLevelClamp)(hTexRef, minMipmapLevelClamp, maxMipmapLevelClamp);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4790,7 +4790,7 @@ extern "C" CUresult cuTexRefSetMipmappedArray ( CUtexref hTexRef, CUmipmappedArr
   typedef CUresult (*cuTexRefSetMipmappedArray_t)( CUtexref hTexRef, CUmipmappedArray hMipmappedArray, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexRefSetMipmappedArray)(hTexRef, hMipmappedArray, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4805,7 +4805,7 @@ extern "C" CUresult cuSurfRefGetArray ( CUarray* phArray, CUsurfref hSurfRef ) {
   typedef CUresult (*cuSurfRefGetArray_t)( CUarray* phArray, CUsurfref hSurfRef );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuSurfRefGetArray)(phArray, hSurfRef);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4819,7 +4819,7 @@ extern "C" CUresult cuSurfRefSetArray ( CUsurfref hSurfRef, CUarray hArray, unsi
   typedef CUresult (*cuSurfRefSetArray_t)( CUsurfref hSurfRef, CUarray hArray, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuSurfRefSetArray)(hSurfRef, hArray, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4834,7 +4834,7 @@ extern "C" CUresult cuTexObjectCreate ( CUtexObject* pTexObject, const CUDA_RESO
   typedef CUresult (*cuTexObjectCreate_t)( CUtexObject* pTexObject, const CUDA_RESOURCE_DESC* pResDesc, const CUDA_TEXTURE_DESC* pTexDesc, const CUDA_RESOURCE_VIEW_DESC* pResViewDesc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexObjectCreate)(pTexObject, pResDesc, pTexDesc, pResViewDesc);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4850,7 +4850,7 @@ extern "C" CUresult cuTexObjectDestroy ( CUtexObject texObject ) {
   typedef CUresult (*cuTexObjectDestroy_t)( CUtexObject texObject );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexObjectDestroy)(texObject);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4866,7 +4866,7 @@ extern "C" CUresult cuTexObjectGetResourceDesc ( CUDA_RESOURCE_DESC* pResDesc, C
   typedef CUresult (*cuTexObjectGetResourceDesc_t)( CUDA_RESOURCE_DESC* pResDesc, CUtexObject texObject );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexObjectGetResourceDesc)(pResDesc, texObject);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4880,7 +4880,7 @@ extern "C" CUresult cuTexObjectGetResourceViewDesc ( CUDA_RESOURCE_VIEW_DESC* pR
   typedef CUresult (*cuTexObjectGetResourceViewDesc_t)( CUDA_RESOURCE_VIEW_DESC* pResViewDesc, CUtexObject texObject );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexObjectGetResourceViewDesc)(pResViewDesc, texObject);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4894,7 +4894,7 @@ extern "C" CUresult cuTexObjectGetTextureDesc ( CUDA_TEXTURE_DESC* pTexDesc, CUt
   typedef CUresult (*cuTexObjectGetTextureDesc_t)( CUDA_TEXTURE_DESC* pTexDesc, CUtexObject texObject );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuTexObjectGetTextureDesc)(pTexDesc, texObject);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4909,7 +4909,7 @@ extern "C" CUresult cuSurfObjectCreate ( CUsurfObject* pSurfObject, const CUDA_R
   typedef CUresult (*cuSurfObjectCreate_t)( CUsurfObject* pSurfObject, const CUDA_RESOURCE_DESC* pResDesc );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuSurfObjectCreate)(pSurfObject, pResDesc);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4925,7 +4925,7 @@ extern "C" CUresult cuSurfObjectDestroy ( CUsurfObject surfObject ) {
   typedef CUresult (*cuSurfObjectDestroy_t)( CUsurfObject surfObject );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuSurfObjectDestroy)(surfObject);
   RETURN_TO_UPPER_HALF();
 /* Insert logging code here */
@@ -4941,7 +4941,7 @@ extern "C" CUresult cuSurfObjectGetResourceDesc ( CUDA_RESOURCE_DESC* pResDesc, 
   typedef CUresult (*cuSurfObjectGetResourceDesc_t)( CUDA_RESOURCE_DESC* pResDesc, CUsurfObject surfObject );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuSurfObjectGetResourceDesc)(pResDesc, surfObject);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4956,7 +4956,7 @@ extern "C" CUresult cuCtxDisablePeerAccess ( CUcontext peerContext ) {
   typedef CUresult (*cuCtxDisablePeerAccess_t)( CUcontext peerContext );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxDisablePeerAccess)(peerContext);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4970,7 +4970,7 @@ extern "C" CUresult cuCtxEnablePeerAccess ( CUcontext peerContext, unsigned int 
   typedef CUresult (*cuCtxEnablePeerAccess_t)( CUcontext peerContext, unsigned int  Flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuCtxEnablePeerAccess)(peerContext, Flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4984,7 +4984,7 @@ extern "C" CUresult cuDeviceCanAccessPeer ( int* canAccessPeer, CUdevice dev, CU
   typedef CUresult (*cuDeviceCanAccessPeer_t)( int* canAccessPeer, CUdevice dev, CUdevice peerDev );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceCanAccessPeer)(canAccessPeer, dev, peerDev);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -4998,7 +4998,7 @@ extern "C" CUresult cuDeviceGetP2PAttribute ( int* value, CUdevice_P2PAttribute 
   typedef CUresult (*cuDeviceGetP2PAttribute_t)( int* value, CUdevice_P2PAttribute attrib, CUdevice srcDevice, CUdevice dstDevice );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuDeviceGetP2PAttribute)(value, attrib, srcDevice, dstDevice);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5013,7 +5013,7 @@ extern "C" CUresult cuGraphicsMapResources ( unsigned int  count, CUgraphicsReso
   typedef CUresult (*cuGraphicsMapResources_t)( unsigned int  count, CUgraphicsResource* resources, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsMapResources)(count, resources, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5027,7 +5027,7 @@ extern "C" CUresult cuGraphicsResourceGetMappedMipmappedArray ( CUmipmappedArray
   typedef CUresult (*cuGraphicsResourceGetMappedMipmappedArray_t)( CUmipmappedArray* pMipmappedArray, CUgraphicsResource resource );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsResourceGetMappedMipmappedArray)(pMipmappedArray, resource);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5041,7 +5041,7 @@ extern "C" CUresult cuGraphicsResourceGetMappedPointer_v2 ( CUdeviceptr* pDevPtr
   typedef CUresult (*cuGraphicsResourceGetMappedPointer_v2_t)( CUdeviceptr* pDevPtr, size_t* pSize, CUgraphicsResource resource );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsResourceGetMappedPointer_v2)(pDevPtr, pSize, resource);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5055,7 +5055,7 @@ extern "C" CUresult cuGraphicsResourceSetMapFlags_v2 ( CUgraphicsResource resour
   typedef CUresult (*cuGraphicsResourceSetMapFlags_v2_t)( CUgraphicsResource resource, unsigned int  flags );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsResourceSetMapFlags_v2)(resource, flags);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5069,7 +5069,7 @@ extern "C" CUresult cuGraphicsSubResourceGetMappedArray ( CUarray* pArray, CUgra
   typedef CUresult (*cuGraphicsSubResourceGetMappedArray_t)( CUarray* pArray, CUgraphicsResource resource, unsigned int  arrayIndex, unsigned int  mipLevel );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsSubResourceGetMappedArray)(pArray, resource, arrayIndex, mipLevel);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5083,7 +5083,7 @@ extern "C" CUresult cuGraphicsUnmapResources ( unsigned int  count, CUgraphicsRe
   typedef CUresult (*cuGraphicsUnmapResources_t)( unsigned int  count, CUgraphicsResource* resources, CUstream hStream );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsUnmapResources)(count, resources, hStream);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5097,7 +5097,7 @@ extern "C" CUresult cuGraphicsUnregisterResource ( CUgraphicsResource resource )
   typedef CUresult (*cuGraphicsUnregisterResource_t)( CUgraphicsResource resource );
   CUresult ret_val = CUDA_SUCCESS;
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   ret_val = REAL_FNC(cuGraphicsUnregisterResource)(resource);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();
@@ -5110,7 +5110,7 @@ extern "C" CUresult cuGraphicsUnregisterResource ( CUgraphicsResource resource )
 extern "C" void                                                                             __cudaRegisterFatBinaryEnd(void **fatCubinHandle) {
   typedef void (*__cudaRegisterFatBinaryEnd_t)(void **fatCubinHandle);
   DMTCP_PLUGIN_DISABLE_CKPT();
-  JUMP_TO_LOWER_HALF(lhInfo.lhFsAddr);
+  JUMP_TO_LOWER_HALF(lh_info->fsaddr);
   REAL_FNC(__cudaRegisterFatBinaryEnd)(fatCubinHandle);
   RETURN_TO_UPPER_HALF();
   DMTCP_PLUGIN_ENABLE_CKPT();

@@ -73,7 +73,7 @@ class SwitchContext
 // the lower half.
 #define JUMP_TO_LOWER_HALF(lhFs) \
   do { \
-    SwitchContext ctx((unsigned long)lhFs)
+    SwitchContext crac_ctx((unsigned long)lhFs)
 
 // Helper macro to be used whenever making a returning from the lower half to
 // the upper half.

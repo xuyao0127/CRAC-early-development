@@ -14,6 +14,7 @@
 
 #include "dmtcp.h";
 #include "switch-context.h";
+#include "lower-half-api.h";
 #include "upper-half-wrappers.h";
 #include "upper-half-cuda-wrappers.h";
 #include "cuda_autogen_wrappers.h";

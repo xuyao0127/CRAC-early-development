@@ -23,6 +23,7 @@
 #define UPPER_HALF_CUDA_WRAPPERS_H
 
 #include "dmtcp.h"
+#include "lower-half-api.h"
 
 #define REAL_FNC(fnc) \
   ({ fnc##_t fnc##Fnc = (fnc##_t) -1; \
@@ -30,8 +31,7 @@
     initialize_wrappers(); \
   } \
   if (fnc##Fnc == (fnc##_t) -1) { \
-    LhDlsym_t dlsymFptr = (LhDlsym_t)lhInfo.lhDlsym; \
-    fnc##Fnc = (fnc##_t)dlsymFptr(Cuda_Fnc_##fnc); \
+    fnc##Fnc = (fnc##_t)pdlsym(Cuda_Fnc_##fnc); \
   } \
   fnc##Fnc; })
 
