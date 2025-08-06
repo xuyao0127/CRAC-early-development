@@ -41,17 +41,14 @@
 #include <algorithm>
 #include <map>
 
-#include "common.h"
 #include "dmtcp.h"
-// #include "dmtcp_dlsym.h"
 #include "config.h"
 #include "jassert.h"
 #include "procmapsarea.h"
-#include "getmmap.h"
 #include "util.h"
 #include "log_and_replay.h"
-#include "mmap-wrapper.h"
-// #include "device_heap_util.h"
+#include "mem-wrapper.h"
+#include "switch-context.h"
 #include "upper-half-wrappers.h"
 
 // #define _real_dlsym NEXT_FNC(dlsym)
@@ -65,9 +62,8 @@ std::map<void *, lhckpt_pages_t>  lh_pages_maps;
 void * lh_ckpt_mem_addr = NULL;
 size_t lh_ckpt_mem_size = 0;
 int pagesize = sysconf(_SC_PAGESIZE);
-GetMmappedListFptr_t fnc = NULL;
-dmtcp::vector<MmapInfo_t> merged_uhmaps;
-UpperHalfInfo_t uhInfo;
+get_mmapped_list_fptr_t get_mmapped_list_fnc = NULL;
+std::vector<MmapInfo_t> uh_mmaps;
 
 static bool skipWritingTextSegments = false;
 extern "C" pid_t dmtcp_get_real_pid();
@@ -176,65 +172,6 @@ mtcp_write_non_rwx_and_anonymous_pages(int fd, Area *orig_area)
   }
 }
 
-static void
-writememoryarea(int fd, Area *area, int stack_was_seen)
-{
-  void *addr = area->addr;
-
-  if (!(area->flags & MAP_ANONYMOUS)) {
-    JTRACE("save region") (addr) (area->size) (area->name) (area->offset);
-  } else if (area->name[0] == '\0') {
-    JTRACE("save anonymous") (addr) (area->size);
-  } else {
-    JTRACE("save anonymous") (addr) (area->size) (area->name) (area->offset);
-  }
-
-  if ((area->name[0]) == '\0') {
-    char *brk = (char *)sbrk(0);
-    if (brk > area->addr && brk <= area->addr + area->size) {
-      strcpy(area->name, "[heap]");
-    }
-  }
-
-  if (area->size == 0) {
-    /* Kernel won't let us munmap this.  But we don't need to restore it. */
-    JTRACE("skipping over [stack] segment (not the orig stack)")
-      (addr) (area->size);
-  } else if (0 == strcmp(area->name, "[vsyscall]") ||
-             0 == strcmp(area->name, "[vectors]") ||
-             0 == strcmp(area->name, "[vvar]") ||
-             0 == strcmp(area->name, "[vdso]")) {
-    JTRACE("skipping over memory special section")
-      (area->name) (addr) (area->size);
-  } else if (area->prot == 0 ||
-             (area->name[0] == '\0' &&
-              ((area->flags & MAP_ANONYMOUS) != 0) &&
-              ((area->flags & MAP_PRIVATE) != 0))) {
-    /* Detect zero pages and do not write them to ckpt image.
-     * Currently, we detect zero pages in non-rwx mapping and anonymous
-     * mappings only
-     */
-    mtcp_write_non_rwx_and_anonymous_pages(fd, area);
-  } else {
-    /* Anonymous sections need to have their data copied to the file,
-     *   as there is no file that contains their data
-     * We also save shared files to checkpoint file to handle shared memory
-     *   implemented with backing files
-     */
-    JASSERT((area->flags & MAP_ANONYMOUS) || (area->flags & MAP_SHARED));
-
-    if (skipWritingTextSegments && (area->prot & PROT_EXEC)) {
-      area->properties |= DMTCP_SKIP_WRITING_TEXT_SEGMENTS;
-      Util::writeAll(fd, area, sizeof(*area));
-      JTRACE("Skipping over text segments") (area->name) ((void *)area->addr);
-    } else {
-      Util::writeAll(fd, area, sizeof(*area));
-      Util::writeAll(fd, area->addr, area->size);
-    }
-  }
-}
-
-
 // Returns true if needle is in the haystack
 static inline int
 regionContains(const void *haystackStart,
@@ -243,40 +180,6 @@ regionContains(const void *haystackStart,
                const void *needleEnd)
 {
   return needleStart >= haystackStart && needleEnd <= haystackEnd;
-}
-
-bool isMergeable(MmapInfo_t first, MmapInfo_t second) {
-  void * first_end_addr = (void *)((uint64_t)first.addr + first.len);
-  if (first_end_addr == second.addr) {
-    return true;
-  }
-  return false;
-}
-
-void getAndMergeUhMaps()
-{
-  if (lhInfo.lhMmapListFptr && fnc == NULL) {
-    fnc = (GetMmappedListFptr_t) lhInfo.lhMmapListFptr;
-    int numUhRegions = 0;
-    std::vector<MmapInfo_t> uh_mmaps = fnc(&numUhRegions);
-
-    // merge the entries if two entries are continous
-    merged_uhmaps.push_back(uh_mmaps[0]);
-    for(size_t i = 1; i < uh_mmaps.size(); i++) {
-      MmapInfo_t last_merged = merged_uhmaps.back();
-      if (isMergeable(last_merged, uh_mmaps[i])) {
-        MmapInfo_t merged_item;
-        merged_item.addr = last_merged.addr;
-        merged_item.len = last_merged.len + uh_mmaps[i].len;
-        merged_uhmaps.pop_back();
-        merged_uhmaps.push_back(merged_item);
-      } else {
-        // insert uh_maps[i] to the merged list as a new item
-        merged_uhmaps.push_back(uh_mmaps[i]);
-      }
-    }
-    // TODO: print the content once
-  }
 }
 
 /*
@@ -288,7 +191,7 @@ void getAndMergeUhMaps()
 
 #undef dmtcp_skip_memory_region_ckpting
 EXTERNC int
-dmtcp_skip_memory_region_ckpting(ProcMapsArea *area, int fd, int stack_was_seen)
+dmtcp_skip_memory_region_ckpting(ProcMapsArea *area)
 {
   JNOTE("In skip area");
   ssize_t rc = 1;
@@ -299,156 +202,50 @@ dmtcp_skip_memory_region_ckpting(ProcMapsArea *area, int fd, int stack_was_seen)
     return rc; // skip this region
   }
 
-  // get and merge uh maps
-  getAndMergeUhMaps();
-
-  // smaller than smallest uhmaps or greater than largest address
-  if ((area->endAddr < merged_uhmaps[0].addr) || \
-      (area->addr > (void *)((VA)merged_uhmaps.back().addr + \
-                              merged_uhmaps.back().len))) {
-    return rc;
-  }
-
-  // Don't skip the lh_ckpt_region
-  if (lh_ckpt_mem_addr && area->addr == lh_ckpt_mem_addr) {
+  // If it's the upper-half stack, don't skip
+  if (area->addr >= lh_info->uh_stack_start && area->endAddr <= lh_info->uh_stack_end) {
     return 0;
   }
 
-  size_t i = 0;
-  while (i < merged_uhmaps.size()) {
-    void *uhMmapStart = merged_uhmaps[i].addr;
-    void *uhMmapEnd = (VA)merged_uhmaps[i].addr + merged_uhmaps[i].len;
+  get_mmapped_list_fnc = (get_mmapped_list_fptr_t) lh_info->mmap_list_fptr;
 
-    if (regionContains(uhMmapStart, uhMmapEnd, area->addr, area->endAddr)) {
-      JNOTE ("Case 1 detected") ((void*)area->addr) ((void*)area->endAddr) \
-        (uhMmapStart) (uhMmapEnd);
-      return 0; // checkpoint this region
-    } else if ((area->addr < uhMmapStart) && (uhMmapStart < area->endAddr) \
-              && (area->endAddr <= uhMmapEnd)) {
-      JNOTE ("Case 2 detected") ((void*)area->addr) ((void*)area->endAddr) \
-        (uhMmapStart) (uhMmapEnd);
+  int numUhRegions;
+  if (uh_mmaps.size() == 0) {
+    uh_mmaps = get_mmapped_list_fnc(&numUhRegions);
+  }
 
-      // skip the region above the uhMmapStart
-      area->addr = (VA)uhMmapStart;
-      area->size = area->endAddr - area->addr;
-      JNOTE ("Case 2: area to checkpoint") ((void*)area->addr) \
-        ((void*)area->endAddr) (area->size);
-      return 0; // checkpoint but values changed
-    } else if ((uhMmapStart <= area->addr) && (area->addr < uhMmapEnd)) {
-      // check the next element in the merged list if it contains in the area
-      // TODO: handle that case
-      //
-      //  traverse until uhmap's start addr is bigger than the area -> endAddr
-      //  rc = number of the item in the  array
-      //
-     JNOTE("Case 3: detected") ((void*)area->addr) ((void *)area->endAddr) \
-        (area->size);
-//      int dummy=1; while(dummy);
-      ProcMapsArea newArea = *area;
-      newArea.endAddr = (VA)uhMmapEnd;
-      newArea.size = newArea.endAddr - newArea.addr;
-      writememoryarea(fd, &newArea, stack_was_seen);
-      // removing merged uhmap node when checkpointed
-      for(size_t j = i; j < merged_uhmaps.size() - 1; j++){
-        merged_uhmaps[j] = merged_uhmaps[j+1];
-      }
-      // update the area after each writememoryarea
-      if(newArea.endAddr < area->endAddr){
-        area->addr = (VA)newArea.endAddr;
-        area->size = area->endAddr - area->addr;
-        JNOTE("Updated area after checkpointing") ((void*)area->addr) \
-          ((void*)area->endAddr) (area->size);
-      }
-      // whiteAreas[count++] = newArea;
-      while(i < merged_uhmaps.size()-1 \
-            && merged_uhmaps[++i].addr < area->endAddr)
-      {
-        // TODO: Update the area after each writememoryarea
-        // remove the merged uhmaps node when it's ckpt'ed
-        ProcMapsArea newArea = *area;
-        uhMmapStart = merged_uhmaps[i].addr;
-        uhMmapEnd = (VA)merged_uhmaps[i].addr + merged_uhmaps[i].len;
-        if(regionContains(area->addr, area->endAddr, uhMmapStart, uhMmapEnd)) {
-          newArea.addr = (VA)uhMmapStart;
-          newArea.endAddr = (VA)uhMmapEnd;
-          newArea.size = newArea.endAddr - newArea.addr;
-          writememoryarea(fd, &newArea, stack_was_seen);
-      // removing merged uhmap node when checkpointed
-      for(size_t j = i; j < merged_uhmaps.size() - 1; j++){
-        merged_uhmaps[j] = merged_uhmaps[j+1];
-      }
-      // update the area after each writememoryarea
-      if(newArea.endAddr < area->endAddr){
-        area->addr = (VA)newArea.endAddr;
-        area->size = area->endAddr - area->addr;
-        JNOTE("Updated area after checkpointing") ((void*)area->addr) \
-          ((void*)area->endAddr) (area->size);
-      }
-        } else {
-          newArea.addr = (VA)uhMmapStart;
-          newArea.size = newArea.endAddr - newArea.addr;
-          writememoryarea(fd, &newArea, stack_was_seen);
-       // removing merged uhmap node when checkpointed
-      for(size_t j = i; j < merged_uhmaps.size() - 1; j++){
-        merged_uhmaps[j] = merged_uhmaps[j+1];
-      }
-      // update the area after each writememoryarea
-      if(newArea.endAddr < area->endAddr){
-        area->addr = (VA)newArea.endAddr;
-        area->size = area->endAddr - area->addr;
-        JNOTE("Updated area after checkpointing") ((void*)area->addr) \
-          ((void*)area->endAddr) (area->size);
-      }
-          return 1;
-        }
-      }
-    } else if (regionContains(area->addr, area->endAddr,
-                              uhMmapStart, uhMmapEnd)) {
-      JNOTE("Case 4: detected") (area->addr) (area->endAddr) (area->size);
-      fflush(stdout);
-      // TODO: this usecase is not completed; fix it later
-      // int dummy = 1; while(dummy);
-      // JNOTE("skipping the region partially ") (area->addr) (area->endAddr)
-      //   (area->size) (array[i].len);
-      area->addr = (VA)uhMmapStart;
-      area->endAddr = (VA)uhMmapEnd;
-      area->size = area->endAddr - area->addr;
-      rc = 2; // skip partially
-      break;
+  for (MmapInfo_t &region : uh_mmaps) {
+    if (regionContains(region.addr, region.addr + region.len,
+                       area->addr, area->endAddr)) {
+      return 0;
     }
-    i++;
+    if (regionContains(area->addr, area->endAddr,
+                       region.addr, region.addr + region.len)) {
+      area->addr = (char*) region.addr;
+      area->endAddr = (char*) (region.addr + region.len);
+      area->size = area->endAddr - area->addr;
+      return 0;
+    }
+    if (area->addr < region.addr && region.addr < area->endAddr &&
+        area->endAddr < region.addr + region.len) {
+      area->addr = (char*) region.addr;
+      area->size = area->endAddr - area->addr;
+      return 0;
+    }
+    if (region.addr < area->addr && area->addr < region.addr + region.len &&
+        region.addr + region.len < area->endAddr) {
+      area->endAddr = (char*) (region.addr + region.len);
+      area->size = area->endAddr - area->addr;
+      return 0;
+    }
   }
   return 1;
 }
-/*
-void init()
-{
-  // typedef void (*cudaRegisterAllFptr_t) ();
-  void * dlsym_handle = _real_dlopen(NULL, RTLD_NOW);
-  JASSERT(dlsym_handle) (_real_dlerror());
-  void * cudaRegisterAllFptr = _real_dlsym(dlsym_handle, "_ZL24__sti____cudaRegisterAllv");
-  JASSERT(cudaRegisterAllFptr) (_real_dlerror());
-  JNOTE("found symbol") (cudaRegisterAllFptr);
-}
-*/
 
 void save_lh_pages_to_memory()
 {
   // get the Lower-half page maps
   lh_pages_maps = getLhPageMaps();
-  /*
-  // add the device heap entry to lh_pages_maps
-  size_t cudaDeviceHeapSize = 0;
-  cudaDeviceGetLimit(&cudaDeviceHeapSize, cudaLimitMallocHeapSize);
-
-  JASSERT(lhInfo.lhGetDeviceHeapFptr) ("GetDeviceHeapFptr is not set up");
-  GetDeviceHeapPtrFptr_t func = (GetDeviceHeapPtrFptr_t) lhInfo.lhGetDeviceHeapFptr;
-  void *mallocPtr = func();
-
-  size_t actualHeapSize = (size_t)((VA)ROUND_UP(mallocPtr) - (VA)lhInfo.lhDeviceHeap);
-  JASSERT(actualHeapSize > 0) (mallocPtr) (lhInfo.lhDeviceHeap);
-  lhckpt_pages_t page = {CUDA_HEAP_PAGE, lhInfo.lhDeviceHeap, actualHeapSize};
-  lh_pages_maps[lhInfo.lhDeviceHeap] = page; */
 
   size_t total_size = sizeof(int);
   for (auto lh_page : lh_pages_maps) {
@@ -501,24 +298,7 @@ void save_lh_pages_to_memory()
           cudaMemcpy(((VA)addr + count), mem_addr, mem_len, \
                      cudaMemcpyDeviceToHost);
           break;
-        } /*
-        case (CUDA_HEAP_PAGE):
-        {
-          void *__cudaPtr = NULL;
-          void * deviceHeapStart = mem_addr;
-          size_t heapSize = mem_len;
-          cudaMalloc(&__cudaPtr, heapSize);
-          JASSERT(lhInfo.lhCopyToCudaPtrFptr)
-                 ("copyFromCudaPtrFptr is not set up");
-          CopyToCudaPtrFptr_t func1 =
-                   (CopyToCudaPtrFptr_t) lhInfo.lhCopyToCudaPtrFptr;
-          func1(__cudaPtr, deviceHeapStart, heapSize);
-          cudaMemcpy(((VA)addr + count),
-                      __cudaPtr,
-                      mem_len, cudaMemcpyDeviceToHost);
-          cudaFree(__cudaPtr);
-          break;
-        } */
+        }
         default:
         {
           JASSERT(false) ("page type unkown");
@@ -531,6 +311,39 @@ void save_lh_pages_to_memory()
   }
 }
 
+void restore_device_pages() {
+  lh_pages_maps = getLhPageMaps();
+
+  // read total entries count
+  int total_entries = 0;
+  int count = 0;
+  memcpy(&total_entries, ((VA)lh_ckpt_mem_addr+count), sizeof (total_entries));
+  count += sizeof (total_entries);
+  for (int i = 0; i < total_entries; i++) {
+    // read metadata of one entry
+    lhckpt_pages_t lhpage_info;
+    memcpy(&lhpage_info, ((VA)lh_ckpt_mem_addr+count), sizeof (lhpage_info));
+    count += sizeof(lhpage_info);
+
+    void *dest_addr = lhpage_info.mem_addr;
+    size_t size = lhpage_info.mem_len;
+
+    switch (lhpage_info.mem_type) {
+      case (CUDA_UVM_PAGE):
+      case (CUDA_MALLOC_PAGE):
+      {
+        // copy back the actual data
+        cudaMemcpy(dest_addr, ((VA)lh_ckpt_mem_addr+count), size, cudaMemcpyHostToDevice);
+        count += size;
+        break;
+      }
+      default:
+        printf("page type not implemented\n");
+        break;
+    }
+  }
+}
+
 void pre_ckpt()
 {
   /**/
@@ -538,41 +351,6 @@ void pre_ckpt()
   cudaDeviceSynchronize();
   save_lh_pages_to_memory();
   enableLogging();
-}
-
-// Writes out the lhinfo global object to a file. Returns 0 on success,
-// -1 on failure.
-static void
-writeUhInfoToFile()
-{
-  char filename[100];
-  snprintf(filename, 100, "./uhInfo_%d", getpid());
-  int fd = open(filename, O_WRONLY | O_CREAT, 0644);
-  JASSERT (fd != -1) ("Could not create uhaddr.bin file.") (JASSERT_ERRNO);
-
-  size_t rc = write(fd, &uhInfo, sizeof(uhInfo));
-  JASSERT(rc >= sizeof(uhInfo))("Wrote fewer bytes than expected to uhaddr.bin")
-    (JASSERT_ERRNO);
-  close(fd);
-}
-
-// sets up upper-half info for the lower-half to use on the restart
-static void
-setupUpperHalfInfo()
-{
-  GetEndOfHeapFptr_t func = (GetEndOfHeapFptr_t) lhInfo.uhEndofHeapFptr;
-  uhInfo.uhEndofHeap = (void *)func();
-  uhInfo.lhPagesRegion = (void *)lh_ckpt_mem_addr;
-  uhInfo.cudaLogVectorFptr = (void *)&getCudaCallsLog;
-  // FIXME: We'll just write out the uhInfo object to a file; the lower half
-  // will read this file to figure out the information. This is ugly
-  // but will work for now.
-  unsigned long addr = 0;
-  syscall(SYS_arch_prctl, ARCH_GET_FS, &addr);
-  JNOTE("upper-half FS") ((void *)addr);
-  JNOTE("uhInfo") ((void *)&uhInfo) (uhInfo.uhEndofHeap) (uhInfo.lhPagesRegion)
-    (uhInfo.cudaLogVectorFptr);
-  writeUhInfoToFile();
 }
 
 void resume()
@@ -588,19 +366,15 @@ void resume()
     JTRACE("no memory region was allocated earlier")
           (lh_ckpt_mem_addr) (lh_ckpt_mem_size);
   }
-  setupUpperHalfInfo();
 }
 
 void restart()
 {
   reset_wrappers();
-  initialize_wrappers();
-  // fix lower-half fs
-  unsigned long addr = 0;
-  syscall(SYS_arch_prctl, ARCH_GET_FS, &addr);
-  memcpy((long *)((VA)lhInfo.lhFsAddr+40), (long *)(addr+40), sizeof(long));
-  JNOTE("upper-half FS") ((void *)addr);
-  JNOTE("lower-half FS") ((void *)lhInfo.lhFsAddr);
+  disableLogging();
+  logs_read_and_apply();
+  restore_device_pages();
+  enableLogging();
 }
 
 static void

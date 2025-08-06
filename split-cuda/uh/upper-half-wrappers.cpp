@@ -29,7 +29,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "common.h"
+#include "dmtcp.h"
+#include "lower-half-api.h"
 #include "upper-half-wrappers.h"
 
 int initialized = 0;
@@ -37,21 +38,8 @@ int initialized = 0;
 static void readLhInfoAddr();
 extern "C" pid_t dmtcp_get_real_pid();
 
-LowerHalfInfo_t lhInfo = {0};
-
-void*
-sbrk(intptr_t increment)
-{
-  static __typeof__(&sbrk) lowerHalfSbrkWrapper = (__typeof__(&sbrk)) - 1;
-  if (!initialized) {
-    initialize_wrappers();
-  }
-  if (lowerHalfSbrkWrapper == (__typeof__(&sbrk)) - 1) {
-    lowerHalfSbrkWrapper = (__typeof__(&sbrk))lhInfo.lhSbrk;
-  }
-  // TODO: Switch fs context
-  return lowerHalfSbrkWrapper(increment);
-}
+LowerHalfInfo_t *lh_info;
+proxyDlsym_t pdlsym;
 
 void*
 mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
@@ -61,10 +49,12 @@ mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
     initialize_wrappers();
   }
   if (lowerHalfMmapWrapper == (__typeof__(&mmap)) - 1) {
-    lowerHalfMmapWrapper = (__typeof__(&mmap))lhInfo.lhMmap;
+    lowerHalfMmapWrapper = (__typeof__(&mmap))lh_info->mmap;
   }
-  // TODO: Switch fs context
-  return lowerHalfMmapWrapper(addr, length, prot, flags, fd, offset);
+  DMTCP_PLUGIN_DISABLE_CKPT();
+  void *ret = lowerHalfMmapWrapper(addr, length, prot, flags, fd, offset);
+  DMTCP_PLUGIN_ENABLE_CKPT();
+  return ret;
 }
 
 int
@@ -75,10 +65,12 @@ munmap(void *addr, size_t length)
     initialize_wrappers();
   }
   if (lowerHalfMunmapWrapper == (__typeof__(&munmap)) - 1) {
-    lowerHalfMunmapWrapper = (__typeof__(&munmap))lhInfo.lhMunmap;
+    lowerHalfMunmapWrapper = (__typeof__(&munmap))lh_info->munmap;
   }
-  // TODO: Switch fs context
-  return lowerHalfMunmapWrapper(addr, length);
+  DMTCP_PLUGIN_DISABLE_CKPT();
+  int ret = lowerHalfMunmapWrapper(addr, length);
+  DMTCP_PLUGIN_ENABLE_CKPT();
+  return ret;
 }
 
 void
@@ -93,24 +85,45 @@ initialize_wrappers()
 void
 reset_wrappers()
 {
-  initialized = 0;
+  readLhInfoAddr();
 }
 
 static void
 readLhInfoAddr()
 {
-  char filename[100];
-  snprintf(filename, 100, "./lhInfo_%d", dmtcp_get_real_pid());
-  int fd = open(filename, O_RDONLY);
-  if (fd < 0) {
-    printf("Could not open %s for reading.", filename);
-    exit(-1);
+  char *addr_str = getenv("CRAC_LH_INFO_ADDR");
+  // If the env var is set, MANA is launching. Otherwise, MANA is restarting
+  if (addr_str != NULL) {
+    lh_info = (LowerHalfInfo_t*) strtol(addr_str, NULL, 16);
+  } else {
+    // File name format: mana_tmp_lh_info_[hostname]_[pid]
+    char filename[100] = "/tmp/crac_tmp_lh_info_";
+    gethostname(filename + strlen(filename), 100 - strlen(filename));
+    filename[strlen(filename)] = '_';
+    // Convert real pid to char* without calling snprintf
+    // During process startup, avoid directly or indirectly
+    // calling a libc function that is a DMTCP wrapper.
+    int real_pid = dmtcp_get_real_pid();
+    static char buf[32] = {0};
+    int i = 30;
+    for(; real_pid && i ; --i, real_pid /= 10) {
+      buf[i] = "0123456789"[real_pid % 10];
+    }
+    memcpy(filename + strlen(filename), &buf[i+1], strlen(&buf[i+1]));
+    int fd = open(filename, O_RDONLY);
+    if (fd < 0) {
+      printf("Could not open %s for reading.\n", filename);
+      exit(-1);
+    }
+    ssize_t rc = read(fd, &lh_info, sizeof(lh_info));
+    if (rc != (ssize_t)sizeof(lh_info)) {
+      perror("Read fewer bytes than expected from addr.bin.\n");
+      exit(-1);
+    }
+    close(fd);
+    if (remove(filename) != 0) {
+      fprintf(stderr, "Cannot remove CRAC tmp file %s\n", filename);
+    }
   }
-  ssize_t rc = read(fd, &lhInfo, sizeof(lhInfo));
-  if (rc != (ssize_t)sizeof(lhInfo)) {
-    perror("Read fewer bytes than expected from addr.bin.");
-    exit(-1);
-  }
-//  unlink(LH_FILE_NAME);
-//  close(fd);
+  pdlsym = (proxyDlsym_t)lh_info->lh_dlsym;
 }

@@ -1,0 +1,25 @@
+This lower-half program has the capability of:
+1. Linking to the CUDA library.
+2. Executing a "kernel-laoder" that will load the upp-half program (the user
+   CUDA program containing the MPI application code).
+3. Restoring the upper-half program at the time of restart.
+
+During launch, it (1) initialize
+the lower-half. Then (2) writes the lh_info address to an environment
+variable CRAC_LH_INFO_ADDR so that the upper-half program (including DMTCP
+and CRAC's wrappers) knows information of the lower-half program. After
+setting up, the lower-half program (3) execute a "kernel-loader" to load
+the upper-half program.
+
+When an CUDA function is called in the upper-half, the CRAC CUDA wrapper
+functions in the upper-half will redirect the call to the real CUDA
+function linked with the lower-half program.
+
+During restart, it (1) Initialize the lower-half program. Then (2)
+connects to the DMTCP coordinator, and (3) uses DMTCP APIs to restore
+the upper-half program. During restart, the lh_info address is shared
+using an external file because environment variables inthe upper-half
+are inheritated from the checkpoint time, instead of from the lower-half
+program. These temp files will be saved in the /tmp/ directory, and
+cleaned after the upper-half program is properly restored. The filename
+format is "crac_tmp_lh_info_[hostname]_[pid]".

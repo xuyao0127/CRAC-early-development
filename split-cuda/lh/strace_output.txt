@@ -1,2 +1,0 @@
-execve("./custom-loader.o", ["./custom-loader.o", "/global/homes/g/gautamaa/CRAC-ea"...], 0x7ffe293171c8 /* 257 vars */) = -1 EACCES (Permission denied)
-+++ exited with 1 +++

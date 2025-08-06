@@ -24,8 +24,7 @@
 
 #include <map>
 #include <vector>
-#include "lower_half_cuda_if.h"
-#include "common.h"
+#include "lower-half-api.h"
 
 // enum for types
 enum pages_t {
