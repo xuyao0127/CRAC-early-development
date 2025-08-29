@@ -63,9 +63,8 @@ void * lh_ckpt_mem_addr = NULL;
 size_t lh_ckpt_mem_size = 0;
 int pagesize = sysconf(_SC_PAGESIZE);
 get_mmapped_list_fptr_t get_mmapped_list_fnc = NULL;
-std::vector<MmapInfo_t> uh_mmaps;
+std::vector<MmapInfo_t> *uh_mmaps;
 
-static bool skipWritingTextSegments = false;
 extern "C" pid_t dmtcp_get_real_pid();
 /* This function returns a range of zero or non-zero pages. If the first page
  * is non-zero, it searches for all contiguous non-zero pages and returns them.
@@ -202,6 +201,11 @@ dmtcp_skip_memory_region_ckpting(ProcMapsArea *area)
     return rc; // skip this region
   }
 
+  if (strstr(area->name, "heap")) {
+    JTRACE("Ignoring heap region")(area->name)((void*)area->addr);
+    return 1;
+  }
+
   // If it's the upper-half stack, don't skip
   if (area->addr >= lh_info->uh_stack_start && area->endAddr <= lh_info->uh_stack_end) {
     return 0;
@@ -210,11 +214,11 @@ dmtcp_skip_memory_region_ckpting(ProcMapsArea *area)
   get_mmapped_list_fnc = (get_mmapped_list_fptr_t) lh_info->mmap_list_fptr;
 
   int numUhRegions;
-  if (uh_mmaps.size() == 0) {
+  if (uh_mmaps == NULL) {
     uh_mmaps = get_mmapped_list_fnc(&numUhRegions);
   }
 
-  for (MmapInfo_t &region : uh_mmaps) {
+  for (MmapInfo_t &region : *uh_mmaps) {
     if (regionContains(region.addr, region.addr + region.len,
                        area->addr, area->endAddr)) {
       return 0;
@@ -371,6 +375,7 @@ void resume()
 void restart()
 {
   reset_wrappers();
+  initialize_wrappers();
   disableLogging();
   logs_read_and_apply();
   restore_device_pages();

@@ -28,7 +28,9 @@ include/stamp-h1
 include/dmtcp/version.h
 plugin/Makefile
 plugin/.deps
-test/autotest_config.py
+split-cuda/test/*.exe
+split-cuda/lh/lower-half
+split-cuda/cuda-wrappers/cuda_autogen_wrappers.cpp
 *.deps*
 
 ckpt_*.dmtcp

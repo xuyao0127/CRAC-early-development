@@ -73,6 +73,7 @@ void set_addr_no_randomize(char *argv[]);
 char *allocate_rtld_heap();
 void initialize_lh_info();
 void write_lh_info_addr(int restore_mode);
+void *lh_dlsym(enum Cuda_Fncs_t fnc);
 
 // Restart Mode helper functions
 int parse_restore_flag(int *argc, char **argv);
@@ -370,7 +371,7 @@ void initialize_lh_info()
  */
 void write_lh_info_addr(int restore_mode) 
 {
-    if (restore_mode) {
+  if (restore_mode) {
     // File name format: crac_tmp_lh_info_[hostname]_[pid]
     char filename[100] = "/tmp/crac_tmp_lh_info_";
     gethostname(filename + strlen(filename), 100 - strlen(filename));

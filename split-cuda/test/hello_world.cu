@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 
 __global__ void helloCUDA()
 {
@@ -9,5 +10,6 @@ int main()
 {
     helloCUDA<<<1, 1>>>();
     cudaDeviceSynchronize();
+    sleep(10);
     return 0;
 }

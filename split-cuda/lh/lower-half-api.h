@@ -823,8 +823,15 @@ static const char *cuda_Fnc_to_str[]  __attribute__((used)) =
   "Cuda_Fnc_Invalid"
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void* lh_dlsym(enum Cuda_Fncs_t fnc);
 typedef void* (*proxyDlsym_t)(enum Cuda_Fncs_t fnc);
+#ifdef __cplusplus
+}
+#endif
+
 extern proxyDlsym_t pdlsym;
 
 #endif // ifndef _LOWER_HALF_API_H

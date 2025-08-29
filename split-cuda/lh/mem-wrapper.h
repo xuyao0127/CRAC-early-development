@@ -26,6 +26,6 @@
 void* mmap_wrapper(void *, size_t , int , int , int , off_t );
 void* restore_mmap(void *, size_t , int , int , int , off_t );
 int munmap_wrapper(void *, size_t);
-std::vector<MmapInfo_t> &get_mmapped_list(int *num);
-typedef std::vector<MmapInfo_t>& (*get_mmapped_list_fptr_t)(int *num);
+std::vector<MmapInfo_t>* get_mmapped_list(int *num);
+typedef std::vector<MmapInfo_t>* (*get_mmapped_list_fptr_t)(int *num);
 #endif // MMAP_WRAPPER_H

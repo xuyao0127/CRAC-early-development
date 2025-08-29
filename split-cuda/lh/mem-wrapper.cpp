@@ -289,6 +289,12 @@ static void* __mmap_wrapper(void *addr, size_t length, int prot,
       max_allocated_addr = (char*)addr + length;
     }
   }
+  if ((char*)addr == (char*)0xcc000000) {
+    printf("0xcc found\n");
+    fflush(stdout);
+    volatile int dummy = 1;
+    while (dummy);
+  }
 #ifdef MAP_FIXED_NOREPLACE
   flags &= ~MAP_FIXED_NOREPLACE;
 #endif
