@@ -19,6 +19,9 @@
  *  <http://www.gnu.org/licenses/>.                                         *
  ****************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern void __cudaPushCallConfiguration(dim3 gridDim, dim3 blockDim,
     size_t sharedMem, void * stream);
 
@@ -94,3 +97,7 @@ extern cudaError_t __cudaPopCallConfiguration(dim3 *gridDim, dim3 *blockDim,
 extern void __cudaRegisterFatBinaryEnd(
   void **fatCubinHandle
 );
+#ifdef __cplusplus
+}
+#endif
+

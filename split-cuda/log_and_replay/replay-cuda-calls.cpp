@@ -27,6 +27,7 @@
 #include <cublas_v2.h>
 #include <assert.h>
 #include <stdio.h>
+#include "cudart_apis.h"
 
 #if !defined(__CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__)
 #define __CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__
@@ -187,10 +188,7 @@ void replayAPI(CudaCallLog_t *l)
       chars_read += sizeof sharedMem;
       memcpy(&stream, l->fncargs + chars_read, sizeof (void *));
       // replay
-      typedef unsigned int (*pushFptr_t)(dim3 gridDim, dim3 blockDim, size_t sharedMem, void * stream);
-      Cuda_Fncs_t fnc = Cuda_Fnc___cudaPushCallConfiguration;
-      pushFptr_t func = (pushFptr_t)lh_dlsym(fnc);
-      func(gridDim, blockDim,sharedMem, stream);
+      __cudaPushCallConfiguration(gridDim, blockDim,sharedMem, stream);
       break;
     }
     case GENERATE_ENUM(__cudaRegisterFatBinary):
@@ -1165,8 +1163,7 @@ void replayAPI(CudaCallLog_t *l)
 // void logs_read_and_apply(void (*apply)(CudaCallLog_t *l))
 void logs_read_and_apply()
 {
-  GetCudaCallsLogFptr_t fnc = (GetCudaCallsLogFptr_t)uhInfo.cudaLogVectorFptr;
-  std::vector<CudaCallLog_t>& cudaCallsLog = fnc();
+  std::vector<CudaCallLog_t>& cudaCallsLog = getCudaCallsLog();
   for (auto it = cudaCallsLog.begin(); it != cudaCallsLog.end(); it++) {
     replayAPI(&(*it));
   }
