@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "cudart_apis.h"
+#include "upper-half-cuda-wrappers.h"
 
 #if !defined(__CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__)
 #define __CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__
@@ -193,6 +194,8 @@ void replayAPI(CudaCallLog_t *l)
     }
     case GENERATE_ENUM(__cudaRegisterFatBinary):
     {
+      printf("cudaRegisterFatBinary is replayed\n");
+      fflush(stdout);
       void * fatCubin;
       memcpy(&fatCubin, l->fncargs + chars_read, sizeof(void *));
       chars_read += sizeof (void *);
@@ -203,6 +206,7 @@ void replayAPI(CudaCallLog_t *l)
       printf("\n old fatcubinhandle = %p\n", oldRes);
       printf("fatcubinhandle = %p\n", newRes);
       new_fatCubinHandle = newRes;
+      global_fatCubinHandle = newRes;
       // JASSERT(memcmp(&oldRes, *newRes, sizeof(*newRes))!= 0)
       //   .Text("old and new results are not same!");
       break;

@@ -64,6 +64,8 @@ size_t lh_ckpt_mem_size = 0;
 int pagesize = sysconf(_SC_PAGESIZE);
 get_mmapped_list_fptr_t get_mmapped_list_fnc = NULL;
 std::vector<MmapInfo_t> *uh_mmaps;
+void *global_fatCubin;
+void **global_fatCubinHandle;
 
 extern "C" pid_t dmtcp_get_real_pid();
 /* This function returns a range of zero or non-zero pages. If the first page

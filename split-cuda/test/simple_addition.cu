@@ -23,9 +23,19 @@ int main(int argc, char **argv)
 	printf("Hey\n");
 	fflush(stdout);
 	cudaMallocManaged(&cuda_c, sizeof(int));
+        printf("\nckpt point 1: before kernel\n");
+        fflush(stdout);
+        sleep(10);
 	add<<<1,1>>>(a, b, cuda_c);
+	cudaDeviceSynchronize();
+        printf("ckpt point 2: after kernel\n");
+        fflush(stdout);
+        sleep(10);
 	cudaError_t ret = cudaMemcpy(&c, cuda_c, sizeof(int), cudaMemcpyDeviceToHost);
-	 printf("device 1: %d \n", *cuda_c);
+	printf("device 1: %d \n", *cuda_c);
+        printf("ckpt point 3: after copying to host\n");
+        fflush(stdout);
+        sleep(10);
 
 	cudaSetDevice(1);
 	int *cuda_c2 = NULL;
@@ -34,8 +44,8 @@ int main(int argc, char **argv)
 	printf("device 1: %d \n", *cuda_c);
 	ret = cudaMemcpy(cuda_c2, cuda_c, sizeof(int), cudaMemcpyDeviceToDevice);
 	printf("error: %s \n", cudaGetErrorString(ret));	
-//        printf("device 1: %d \n", *cuda_c);
-//        printf("device 2: %d \n", *cuda_c2);
+        printf("device 1: %d \n", *cuda_c);
+        printf("device 2: %d \n", *cuda_c2);
 
 	cudaDeviceSynchronize();
 	ret = cudaMemcpy(&c, cuda_c2, sizeof(int), cudaMemcpyDeviceToHost);
