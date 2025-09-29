@@ -105,8 +105,6 @@ logAPI(Cuda_Fncs_t cuda_fnc_op, ...)
   {
     return;
   }
-  // printf("In logAPI\n");
-  fflush(stdout);
   va_list arglist;
   va_start (arglist, cuda_fnc_op);
   CudaCallLog_t log;
@@ -115,8 +113,6 @@ logAPI(Cuda_Fncs_t cuda_fnc_op, ...)
   // fill the cuda function op fisrtmem_typeto the buf
   memcpy(buf + chars_wrote, &cuda_fnc_op, sizeof cuda_fnc_op);
   chars_wrote += sizeof cuda_fnc_op;
-  printf("In logAPI %s:start\n", cuda_Fnc_to_str[cuda_fnc_op]);
-  fflush(stdout);
 
   switch(cuda_fnc_op) {
     case GENERATE_ENUM(cudaMalloc):
@@ -242,6 +238,15 @@ logAPI(Cuda_Fncs_t cuda_fnc_op, ...)
       log.res_size = sizeof(*res);
       log.results = (char *)JALLOC_MALLOC(log.res_size + 1);
       memcpy(log.results, res, sizeof (*res));
+      break;
+    }
+    case GENERATE_ENUM(__cudaRegisterFatBinaryEnd):
+    {
+      // args
+      void **fatCubinHandle = va_arg(arglist, void **);
+      memcpy(buf + chars_wrote, fatCubinHandle, sizeof (*fatCubinHandle));
+      chars_wrote += sizeof (*fatCubinHandle);
+
       break;
     }
     case GENERATE_ENUM(__cudaUnregisterFatBinary):

@@ -194,8 +194,6 @@ void replayAPI(CudaCallLog_t *l)
     }
     case GENERATE_ENUM(__cudaRegisterFatBinary):
     {
-      printf("cudaRegisterFatBinary is replayed\n");
-      fflush(stdout);
       void * fatCubin;
       memcpy(&fatCubin, l->fncargs + chars_read, sizeof(void *));
       chars_read += sizeof (void *);
@@ -203,12 +201,19 @@ void replayAPI(CudaCallLog_t *l)
       memcpy(&oldRes, l->fncargs + chars_read, sizeof(void *));
       // replay
       void  **newRes = __cudaRegisterFatBinary(fatCubin);
-      printf("\n old fatcubinhandle = %p\n", oldRes);
-      printf("fatcubinhandle = %p\n", newRes);
       new_fatCubinHandle = newRes;
       global_fatCubinHandle = newRes;
       // JASSERT(memcmp(&oldRes, *newRes, sizeof(*newRes))!= 0)
       //   .Text("old and new results are not same!");
+      break;
+    }
+    case GENERATE_ENUM(__cudaRegisterFatBinaryEnd):
+    {
+      void *fatCubinHandle;
+      memcpy(&fatCubinHandle, l->fncargs + chars_read, sizeof(void *));
+      // replay
+      __cudaRegisterFatBinaryEnd(new_fatCubinHandle);
+      // JTRACE(" __cudaUnregisterFatBinary replayed");
       break;
     }
     case GENERATE_ENUM(__cudaUnregisterFatBinary):
